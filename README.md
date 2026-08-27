@@ -257,14 +257,6 @@ The project uses OpenCV/object-detection-based visual analysis for identifying r
 
 The system analyzes the frame to determine the number of visible people/faces.
 
-```text
-Person Count = 1
-        ↓
-NORMAL
-
-Person Count > 1
-        ↓
-MULTIPLE_PERSONS
 ---
 
 <p align="center">
@@ -300,3 +292,4 @@ MULTIPLE_PERSONS
 <p align="center">
   © 2026 AI-Based Online Exam Proctoring System
 </p>
+
