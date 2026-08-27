@@ -265,3 +265,38 @@ NORMAL
 Person Count > 1
         ↓
 MULTIPLE_PERSONS
+---
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI-Artificial%20Intelligence-6C63FF?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Computer%20Vision-00BFFF?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/React-FastAPI-61DAFB?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/MongoDB-Database-47A248?style=for-the-badge" />
+</p>
+
+<h2 align="center">🚀 AI-Powered Proctoring for Smarter Online Examinations</h2>
+
+<p align="center">
+  <i>Built with technology, intelligence, and continuous learning.</i>
+</p>
+
+<p align="center">
+  <strong>AICTE AI Internship Program 2026</strong><br>
+  XTRAGRAD Technologies
+</p>
+
+<p align="center">
+  <a href="https://github.com/rakshitad22/AI-Online-Exam-Proctoring">⭐ View on GitHub</a>
+  •
+  <a href="#-installation">📖 Documentation</a>
+  •
+  <a href="#-future-enhancements">🔮 Future Scope</a>
+</p>
+
+<p align="center">
+  Made with ❤️ by <strong>Rakshita D.</strong> & Project Team
+</p>
+
+<p align="center">
+  © 2026 AI-Based Online Exam Proctoring System
+</p>
