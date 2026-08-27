@@ -1,223 +1,267 @@
-# AI-Based Online Exam Proctoring and Abnormal Activity Detection System
+# 🤖 AI-Based Online Exam Proctoring and Abnormal Activity Detection System
 
-> **Final-Year Engineering Project**  
-> Conceptual Methodology Reference: *"Effectiveness of Pre-Trained CNN Networks for Detecting Abnormal Activities in Online Exams"*
+<p align="center">
+  <strong>AICTE AI Internship Program 2026 | XTRAGRAD Technologies</strong>
+</p>
 
----
+<p align="center">
+  An AI-powered full-stack online examination platform that uses Computer Vision and Deep Learning-inspired visual analytics to monitor candidates, detect abnormal activities, calculate risk scores, and generate proctoring reports.
+</p>
 
-## 📋 1. Problem Statement
-
-Remote online examinations have gained immense popularity across higher educational institutions. However, maintaining academic integrity without physical invigilators is a major challenge. Unsupervised environments enable unethical practices such as using unauthorized external devices (mobile phones), obtaining outside help (multiple persons), looking away at hidden study materials (head movement), or whispering answers to peers (talking behavior). Manual invigilation over webcam video grids is unscalable and error-prone.
-
----
-
-## 🎯 2. Project Objective
-
-The objective of this project is to build an automated, end-to-end full-stack web application that uses **Computer Vision and Deep Learning** to continuously monitor a candidate's webcam stream during an online exam, detect suspicious activities in real time, issue progressive warnings, calculate candidate risk scores, and present live telemetry and audit reports to examiners.
-
----
-
-## 🚀 3. Key System Features
-
-### Student Module
-- **Registration & Role Authentication**: Student login with JWT authorization.
-- **Student Dashboard**: Browse active proctored assessment catalog.
-- **Pre-Exam Camera Verification**: Interactive webcam hardware test and rule verification.
-- **Online Proctored Exam Room**: Timer, question player, live camera stream, real-time AI status indicators (**Green** = Normal, **Yellow** = Warning, **Red** = Critical Violation), progressive warning counter banner, and live violation event logger.
-- **Instant Result & Risk Report**: Detailed score breakdown (correct, wrong, unanswered), proctoring warning tally, transparent risk index, and submission status.
-
-### Admin / Examiner Module
-- **Examiner Dashboard**: High-level telemetry, candidate metrics, active exam stats, and 5-class violation distribution cards.
-- **Exam Management (CRUD)**: Create, edit, activate/deactivate, and delete proctored exams.
-- **Live Invigilation Room (`ActiveMonitoring.jsx`)**: Real-time surveillance grid displaying candidate webcam streams, violation counters, and risk badges.
-- **Audit & Report Manager (`ReportsView.jsx`)**: Detailed candidate audit reports featuring a chronological violation timeline and print-friendly PDF export capabilities.
+<p align="center">
+  <a href="https://github.com/rakshitad22/AI-Online-Exam-Proctoring">
+    <img src="https://img.shields.io/badge/GitHub-Repository-black?logo=github" alt="GitHub">
+  </a>
+  <a href="http://localhost:8008">
+    <img src="https://img.shields.io/badge/Demo-Local%20Application-blue" alt="Demo">
+  </a>
+  <img src="https://img.shields.io/badge/Frontend-React%2018-61DAFB?logo=react" alt="React">
+  <img src="https://img.shields.io/badge/Backend-FastAPI-009688?logo=fastapi" alt="FastAPI">
+  <img src="https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb" alt="MongoDB">
+  <img src="https://img.shields.io/badge/AI-Computer%20Vision-purple" alt="AI">
+</p>
 
 ---
 
-## 🧠 4. AI Detection Methodology & 5 Target Classes
+## 📌 Table of Contents
 
-Inspired by the research paper's motion keyframe and deep learning classification strategy, the system implements real-time video analytics for 5 target behavior classes:
-
-| Class | Activity | Computer Vision Methodology | Severity | Risk Weight |
-| :--- | :--- | :--- | :---: | :---: |
-| **1** | `NORMAL` | Single person centered in frame, compliant posture, no device or mouth activity. | `NONE` | **0** |
-| **2** | `EXTERNAL_DEVICE` | OpenCV / YOLO rectangular object contour detection matching mobile phone aspect ratios ($1.6 - 2.5$). | `HIGH` | **25** |
-| **3** | `MULTIPLE_PERSONS` | Multi-scale face & body detection returning candidate count $> 1$. | `HIGH` | **30** |
-| **4** | `HEAD_MOVEMENT` | Facial center displacement tracking yaw/pitch offsets ($> 22\%$) across a rolling frame buffer. | `LOW` | **5** |
-| **5** | `TALKING` | Visual Mouth Aspect Ratio (MAR) and smile cascade variation analysis across consecutive frames. | `MEDIUM` | **10** |
-
----
-
-## 📐 5. Transparent Risk-Score Formula
-
-$$\text{Risk Score} = \min\left(100, \sum (\text{Violation Count}_i \times \text{Weight}_i)\right)$$
-
-### Risk Categories:
-- **0 – 19%**: `LOW` Risk
-- **20 – 49%**: `MEDIUM` Risk
-- **50 – 74%**: `HIGH` Risk
-- **75 – 100%**: `CRITICAL` Risk
-
-> *Note: The risk index is a project-defined heuristic scoring metric to assist examiner review and is not an official cheating probability.*
-
----
-
-## 🏗️ 6. System Architecture & Data Flow
-
-```
-┌────────────────────────────────────────────────────────┐
-│                   React + Vite SPA                     │
-│  - Webcam Frame Capture (getUserMedia + Canvas)        │
-│  - Real-time AI Status Indicator (Green/Yellow/Red)    │
-│  - Progressive Warning Banner & Exam Questionnaire     │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            │ Base64 Image Frame (HTTP POST /analyze-frame)
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│                  FastAPI REST Server                   │
-│  - JWT Bearer Authentication & CORS                    │
-│  - Proctoring Router & Risk Calculation Engine         │
-└───────────────────────────┬────────────────────────────┘
-                            │
-              ┌─────────────┴─────────────┐
-              ▼                           ▼
-┌─────────────────────────┐  ┌─────────────────────────┐
-│     Vision Engine       │  │   MongoDB Database      │
-│ - OpenCV & Haar Cascade │  │ - Users, Exams, Attempts│
-│ - Motion Keyframe       │  │ - Violations, Reports   │
-│ - 5-Class Detector      │  └─────────────────────────┘
-└─────────────────────────┘
-```
+- [Overview](#-overview)
+- [Problem Statement](#-problem-statement)
+- [Project Objective](#-project-objective)
+- [Key Features](#-key-features)
+- [AI Detection Methodology](#-ai-detection-methodology)
+- [Risk Scoring System](#-risk-scoring-system)
+- [System Architecture](#-system-architecture)
+- [Technology Stack](#-technology-stack)
+- [Project Structure](#-project-structure)
+- [Database Design](#-database-design)
+- [API Endpoints](#-api-endpoints)
+- [Application Workflow](#-application-workflow)
+- [Installation](#-installation)
+- [Running the Application](#-running-the-application)
+- [Demo Credentials](#-demo-credentials)
+- [Testing](#-testing)
+- [Security](#-security)
+- [Limitations](#-limitations)
+- [Future Enhancements](#-future-enhancements)
+- [Project Outcomes](#-project-outcomes)
+- [Learning Outcomes](#-learning-outcomes)
+- [Contributors](#-contributors)
+- [Acknowledgements](#-acknowledgements)
+- [License](#-license)
 
 ---
 
-## 💻 7. Technology Stack
+# 🌟 Overview
 
-- **Frontend**: React 18, Vite, Tailwind CSS, Lucide React Icons, Axios, React Router DOM.
-- **Backend**: Python 3.9+, FastAPI, PyJWT, Passlib (Bcrypt), Pydantic v2, Uvicorn.
-- **Computer Vision**: OpenCV (`opencv-python-headless`), NumPy, Pillow.
-- **Database**: MongoDB (asynchronous driver via Motor).
+The **AI-Based Online Exam Proctoring and Abnormal Activity Detection System** is a full-stack web application designed to assist with monitoring candidates during online examinations.
 
----
+The system combines:
 
-## 📂 8. Project Directory Structure
+- Artificial Intelligence
+- Computer Vision
+- Web Application Development
+- REST APIs
+- Database Persistence
+- Risk Scoring
+- Real-Time Proctoring Interfaces
 
-```
-AI-Online-Exam-Proctoring/
-├── backend/                        # FastAPI REST Backend
-│   ├── app/
-│   │   ├── api/                    # v1 API Routes (Auth, Exams, Users, Proctoring, Reports)
-│   │   ├── core/                   # Config, Database Motor Connection & JWT Security
-│   │   ├── models/                 # MongoDB Pydantic Schema Models
-│   │   ├── schemas/                # Request & Response Data Schemas
-│   │   └── services/               # Business Logic, Risk Score & Exam Evaluation Services
-│   ├── .env.example                # Environment Variable Template
-│   ├── requirements.txt            # Backend Dependencies
-│   ├── seed_data.py                # Demo Account Database Seeder
-│   └── start.py                    # Server Launcher
-├── frontend/                       # React + Vite + Tailwind CSS SPA
-│   ├── src/
-│   │   ├── components/             # Common, Student & Admin UI Components
-│   │   ├── context/                # AuthContext & ExamContext Providers
-│   │   ├── pages/                  # Student & Admin Portal Pages
-│   │   ├── services/               # Axios API Clients
-│   │   ├── App.jsx                 # Routes & Role-Based Protected Guards
-│   │   └── index.css               # Tailwind CSS & Glassmorphism System
-│   ├── package.json
-│   └── vite.config.js
-├── vision/                         # Computer Vision Engine
-│   ├── __init__.py
-│   ├── detector.py                 # Real OpenCV 5-Class Abnormal Activity Detector
-│   └── utils.py                    # Base64 Frame Decoders & Keyframe Motion Filtering
-└── README.md                       # Comprehensive Documentation
-```
+The application monitors webcam frames during an examination and analyzes visual information to identify potentially abnormal activities.
+
+The system focuses on five primary activity classes:
+
+| Class | Activity |
+|---|---|
+| 1 | `NORMAL` |
+| 2 | `EXTERNAL_DEVICE` |
+| 3 | `MULTIPLE_PERSONS` |
+| 4 | `HEAD_MOVEMENT` |
+| 5 | `TALKING` |
+
+The detected activities are converted into weighted risk values that help examiners review candidate behavior.
+
+> **Important:** The risk score is a project-defined heuristic used to assist examiner review. It is not an official probability of cheating.
 
 ---
 
-## 🛢️ 9. MongoDB Database Schemas
+# 📋 Problem Statement
 
-- **`users`**: `_id`, `email`, `full_name`, `hashed_password`, `role` (`student`/`admin`), `student_id`, `department`, `is_active`.
-- **`exams`**: `_id`, `title`, `description`, `duration_minutes`, `total_marks`, `passing_marks`, `questions`, `created_by`, `is_active`.
-- **`exam_attempts`**: `_id`, `student_id`, `exam_id`, `start_time`, `last_active`, `warning_count`, `risk_score`, `risk_category`, `submitted`.
-- **`violations`**: `_id`, `exam_id`, `student_id`, `violation_type`, `severity`, `confidence`, `timestamp`, `details`.
-- **`reports`**: `_id`, `exam_id`, `exam_title`, `student_id`, `student_name`, `score`, `total_marks`, `correct_answers`, `wrong_answers`, `unanswered`, `status`, `total_warnings`, `risk_score`, `risk_category`, `submitted_at`.
+Remote online examinations have become increasingly common across educational institutions.
 
----
+However, maintaining examination integrity without physical invigilators presents several challenges.
 
-## ⚡ 10. Installation & Setup Guide
+Candidates may potentially:
 
-### Prerequisites
-- Node.js `v18+`
-- Python `3.9+`
-- MongoDB running locally on `mongodb://localhost:27017` (or MongoDB Atlas connection string)
+- Use unauthorized external devices
+- Have another person present during the examination
+- Look away from the screen repeatedly
+- Communicate with someone nearby
+- Receive unauthorized assistance
 
-### 1. Database Seeding & Backend Run
+Traditional manual webcam monitoring can become difficult and unscalable when many candidates are taking an examination simultaneously.
 
-```bash
-# Navigate to backend directory
-cd backend
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Seed demo accounts (Admin & Student) and sample exam
-python seed_data.py
-
-# Start FastAPI REST server
-python start.py
-```
-> REST API will start at `http://localhost:8000`. Interactive Swagger docs available at `http://localhost:8000/docs`.
-
-### 2. Frontend Web Application Run
-
-```bash
-# Navigate to frontend directory
-cd frontend
-
-# Install Node modules
-npm install
-
-# Start Vite dev server
-npm run dev
-```
-> Web Dashboard will launch at `http://localhost:5173`.
+Therefore, this project explores an automated approach using **Computer Vision and AI-based visual analysis** to assist examiners in identifying potentially abnormal activities.
 
 ---
 
-## 🔑 11. Demo Login Credentials
+# 🎯 Project Objective
 
-For testing and demonstration, use the seeded demo accounts:
+The primary objective is to build an automated, end-to-end online examination platform capable of:
 
-| Role | Email Address | Password | Description |
-| :--- | :--- | :--- | :--- |
-| **Examiner / Admin** | `admin@example.com` | `admin123` | Access to Admin Dashboard, Live Invigilation, Exam CRUD, and Candidate Reports. |
-| **Student** | `student@example.com` | `student123` | Access to Student Dashboard, Pre-Exam Camera Verification, and Proctored Exam Room. |
-
----
-
-## 🧪 12. Testing Commands & Verification
-
-### Backend Verification
-```bash
-python -m py_compile backend/app/main.py backend/start.py vision/detector.py backend/seed_data.py
-```
-
-### Frontend Verification
-```bash
-cd frontend
-npm run build
-```
+- Providing a secure online examination environment
+- Capturing candidate webcam frames
+- Analyzing visual information
+- Detecting predefined abnormal activities
+- Generating progressive warnings
+- Calculating candidate risk scores
+- Recording detected violations
+- Providing administrator monitoring
+- Generating candidate audit reports
 
 ---
 
-## ⚠️ 13. Limitations & Future Enhancements
+# 🚀 Key Features
 
-### Current Limitations
-- Frame sampling relies on client-side webcam feed (`getUserMedia`) via HTTP REST requests rather than full WebSockets binary streaming.
-- Visual talking detection tracks mouth aspect ratio and facial geometry motion; it does not perform audio speech recognition.
+## 👨‍🎓 Student Module
 
-### Future Enhancements
-- WebSockets integration for low-latency live video streaming.
-- Audio decibel/whisper audio analysis pipeline integration.
-- Custom YOLOv8n fine-tuning on academic cheating datasets (S_OCA dataset).
+### Authentication
+
+- Student registration/login
+- Role-based access
+- JWT-based authorization
+
+### Student Dashboard
+
+- View available examinations
+- Access active assessments
+- View examination information
+
+### Pre-Exam Verification
+
+- Webcam availability check
+- Camera permission handling
+- Examination rule verification
+
+### Online Exam Environment
+
+The student exam environment provides:
+
+- Examination timer
+- Question navigation
+- Answer selection
+- Live webcam stream
+- AI status indicator
+- Warning counter
+- Violation event feedback
+- Exam submission
+
+### Result & Proctoring Summary
+
+After submission, the system can provide:
+
+- Correct answers
+- Wrong answers
+- Unanswered questions
+- Examination score
+- Warning count
+- Risk score
+- Risk category
+- Proctoring summary
+
+---
+
+# 👨‍💼 Admin / Examiner Module
+
+The administrator interface provides:
+
+### Dashboard
+
+- Candidate statistics
+- Examination statistics
+- Proctoring telemetry
+- Violation distribution
+- Risk information
+
+### Exam Management
+
+Administrators can:
+
+- Create examinations
+- View examinations
+- Edit examinations
+- Activate/deactivate examinations
+- Delete examinations
+
+### Live Monitoring
+
+The monitoring interface provides candidate-level information including:
+
+- Candidate status
+- Risk score
+- Violation count
+- Proctoring information
+- Monitoring cards
+
+### Reports
+
+The reporting system provides:
+
+- Candidate details
+- Examination details
+- Score
+- Violation summary
+- Risk score
+- Risk category
+- Chronological violation timeline
+- Print-friendly report layout
+- Browser-based PDF export
+
+---
+
+# 🧠 AI Detection Methodology
+
+The project is conceptually inspired by:
+
+> *Effectiveness of Pre-Trained CNN Networks for Detecting Abnormal Activities in Online Exams*
+
+The system uses visual frame analysis to classify candidate behavior into five target categories.
+
+---
+
+## 1. NORMAL
+
+A candidate is considered normal when:
+
+- A single candidate is detected
+- No external device is detected
+- No sustained abnormal head movement is detected
+- No sustained mouth activity is detected
+
+**Severity:** NONE  
+**Risk Weight:** 0
+
+---
+
+## 2. EXTERNAL_DEVICE
+
+The system analyzes the webcam frame for potential external devices such as mobile phones.
+
+The project uses OpenCV/object-detection-based visual analysis for identifying rectangular object patterns associated with mobile devices.
+
+**Severity:** HIGH  
+**Risk Weight:** 25
+
+---
+
+## 3. MULTIPLE_PERSONS
+
+The system analyzes the frame to determine the number of visible people/faces.
+
+```text
+Person Count = 1
+        ↓
+NORMAL
+
+Person Count > 1
+        ↓
+MULTIPLE_PERSONS
