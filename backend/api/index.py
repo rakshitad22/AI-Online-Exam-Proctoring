@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_swagger_ui_html
 
 # Ensure backend directory is in sys.path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -34,6 +35,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health Check"])
 @app.get("/api/index", tags=["Health Check"])
+@app.get("/api/index.py", tags=["Health Check"])
 def root():
     return {
         "project": settings.PROJECT_NAME,
@@ -42,3 +44,11 @@ def root():
         "docs": "/docs",
         "message": "AI Proctoring API Active on Vercel Serverless."
     }
+
+@app.get("/docs", include_in_schema=False)
+@app.get("/api/index.py/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    return get_swagger_ui_html(
+        openapi_url="/api/v1/openapi.json",
+        title=f"{settings.PROJECT_NAME} - Swagger UI"
+    )
