@@ -1287,28 +1287,27 @@ The project may be used for educational purposes with appropriate attribution.
 
 ---
 
- \<p align="center"> 
+ <p align="center">
 
 ## 🤖 AI-Based Online Exam Proctoring System
 
-\<strong>Detect • Monitor • Analyze • Report\</strong>
+<strong>Detect • Monitor • Analyze • Report</strong>
 
-\<br>\<br>
+<br><br>
 
-\<strong>AICTE AI Internship Program 2026\</strong>\<br>
-
+<strong>AICTE AI Internship Program 2026</strong><br>
 XTRAGRAD Technologies
 
-\<br>\<br>
+<br><br>
 
 ⭐ If you find this project useful, consider starring the repository.
 
-\<br>\<br>
+<br><br>
 
-Made with ❤️ by \<strong>Rakshita D. & Project Team\</strong>
+Made with ❤️ by <strong>Rakshita D. & Project Team</strong>
 
-\<br>\<br>
+<br><br>
 
 © 2026 AI-Based Online Exam Proctoring System
 
- \</p> \`\`\`  
+</p>
