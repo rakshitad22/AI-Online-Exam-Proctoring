@@ -27,15 +27,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Middleware to accurately resolve Vercel x-matched-path rewrite header
-@app.middleware("http")
-async def fix_vercel_path_middleware(request: Request, call_next):
-    matched_path = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
-    if matched_path:
-        clean_path = matched_path.split("?")[0]
-        request.scope["path"] = clean_path
-    return await call_next(request)
-
 # Configure CORS
 cors_origins = settings.BACKEND_CORS_ORIGINS or ["*"]
 app.add_middleware(
@@ -57,4 +48,12 @@ def root():
         "version": "1.0.0",
         "docs": "/docs",
         "message": "AI Proctoring API Active on Vercel Serverless."
+    }
+
+@app.get("/debug-headers", tags=["Diagnostic"])
+def debug_headers(request: Request):
+    return {
+        "scope_path": request.scope.get("path"),
+        "url_path": request.url.path,
+        "headers": dict(request.headers)
     }
