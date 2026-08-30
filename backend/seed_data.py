@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 
-# Add project root directory to sys.path so top-level packages (e.g., 'vision') are importable
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
@@ -103,57 +102,57 @@ cv_questions = [
     },
     {
         "id": "cv_q13",
-        "question_text": "What is the primary purpose of applying cv2.approxPolyDP to a contour in computer vision shape analysis?",
-        "options": ["To compute exact pixel area", "To count color channels", "To approximate a polygonal curve with fewer vertices based on Douglas-Peucker algorithm", "To smooth image borders"],
-        "correct_option": 2,
+        "question_text": "Which classical machine learning cascade classifier structure is widely utilized for rapid face detection in OpenCV?",
+        "options": ["Haar Feature Cascade Classifier", "HOG + Linear SVM", "SSD ResNet-50", "YOLOv8 Small"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "cv_q14",
-        "question_text": "Which color space separates luminance (intensity) from chrominance (color channels), making it useful for skin-tone segmentation under illumination changes?",
-        "options": ["RGB", "HSV / YCrCb", "CMYK", "Grayscale"],
+        "question_text": "What thresholding technique automatically calculates an optimal global intensity threshold separating foreground and background based on intra-class variance?",
+        "options": ["Adaptive Mean Thresholding", "Otsu's Binarization", "Triangle Thresholding", "Binary Inverted Thresholding"],
         "correct_option": 1,
         "marks": 5
     },
     {
         "id": "cv_q15",
-        "question_text": "Which OpenCV class is instantiated to perform object or face detection using XML cascade files?",
-        "options": ["cv2.CascadeClassifier", "cv2.HOGDescriptor", "cv2.Feature2D", "cv2.BackgroundSubtractor"],
+        "question_text": "Which optical flow algorithm calculates sparse feature point motion vectors across consecutive frames using spatial intensity gradients?",
+        "options": ["Lucas-Kanade Optical Flow", "Farneback Dense Flow", "Horn-Schunck Method", "DeepFlow"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "cv_q16",
-        "question_text": "Which function decodes raw binary or base64 image byte buffers into an OpenCV NumPy array?",
-        "options": ["cv2.imread()", "cv2.imdecode()", "cv2.imencode()", "cv2.imwrite()"],
-        "correct_option": 1,
+        "question_text": "Which 3x3 kernel operator computes numerical approximations of horizontal and vertical image intensity gradients?",
+        "options": ["Sobel Operator", "Gaussian Kernel", "Box Filter", "Laplacian of Gaussian"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "cv_q17",
-        "question_text": "Which function renders text string overlays (e.g. classification labels) onto image matrices?",
-        "options": ["cv2.drawMarker()", "cv2.drawKeypoints()", "cv2.putText()", "cv2.displayOverlay()"],
-        "correct_option": 2,
+        "question_text": "What parameter in cv2.findContours specifies storing only contour endpoint segments of horizontal, vertical, and diagonal lines?",
+        "options": ["CHAIN_APPROX_NONE", "CHAIN_APPROX_SIMPLE", "RETR_EXTERNAL", "RETR_TREE"],
+        "correct_option": 1,
         "marks": 5
     },
     {
         "id": "cv_q18",
-        "question_text": "Which OpenCV function generates a structuring element kernel (e.g., RECT, ELLIPSE) for morphological operations?",
-        "options": ["cv2.getStructuringElement()", "cv2.getGaussianKernel()", "cv2.getRotationMatrix2D()", "cv2.getPerspectiveTransform()"],
+        "question_text": "Which method performs 2D image affine transformations such as rotation, scaling, and translation given a 2x3 transformation matrix?",
+        "options": ["cv2.warpAffine()", "cv2.warpPerspective()", "cv2.getPerspectiveTransform()", "cv2.remap()"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "cv_q19",
-        "question_text": "What is the function of Otsu's thresholding algorithm (cv2.THRESH_OTSU) in image binarization?",
-        "options": ["To apply local adaptive thresholding", "To automatically calculate optimal global threshold value by minimizing intra-class variance", "To invert grayscale intensities", "To apply color mapping"],
-        "correct_option": 1,
+        "question_text": "What property calculates spatial moments (m00, m10, m01) of binary contours to determine object centroid coordinates?",
+        "options": ["cv2.moments()", "cv2.contourArea()", "cv2.arcLength()", "cv2.isContourConvex()"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "cv_q20",
-        "question_text": "What core Python data structure represents image matrices in OpenCV's Python API?",
-        "options": ["NumPy ndarray", "Python List of Lists", "PIL Image Object", "PyTorch Tensor"],
+        "question_text": "Which image filtering technique preserves sharp edges while smoothing homogeneous noise regions using range and spatial Gaussian kernels?",
+        "options": ["Bilateral Filter (cv2.bilateralFilter)", "Box Blur", "Gaussian Blur", "Median Blur"],
         "correct_option": 0,
         "marks": 5
     }
@@ -163,142 +162,142 @@ cv_questions = [
 ml_questions = [
     {
         "id": "ml_q1",
-        "question_text": "Which machine learning paradigm involves training models on labeled datasets consisting of input features and target labels?",
-        "options": ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Self-Supervised Learning"],
+        "question_text": "What type of machine learning task predicts continuous numerical outcomes from input features?",
+        "options": ["Regression", "Classification", "Clustering", "Dimensionality Reduction"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q2",
-        "question_text": "Which loss function is most appropriate for training binary classification models outputting probabilities?",
-        "options": ["Mean Squared Error (MSE)", "Binary Cross-Entropy Loss", "Mean Absolute Error (MAE)", "Categorical Hinge Loss"],
+        "question_text": "Which evaluation metric represents the ratio of true positive predictions over total predicted positives?",
+        "options": ["Recall", "Precision", "F1-Score", "Accuracy"],
         "correct_option": 1,
         "marks": 5
     },
     {
         "id": "ml_q3",
-        "question_text": "What condition occurs when a machine learning model fits training data too closely, resulting in high variance and poor generalization to test data?",
-        "options": ["Overfitting", "Underfitting", "Optimal convergence", "High Bias"],
-        "correct_option": 0,
+        "question_text": "What condition occurs when a machine learning model fits training data noise too closely and fails to generalize to unseen test data?",
+        "options": ["Underfitting", "Overfitting", "Optimal Generalization", "High Bias"],
+        "correct_option": 1,
         "marks": 5
     },
     {
         "id": "ml_q4",
-        "question_text": "How is the Precision metric calculated in classification evaluation?",
-        "options": ["True Positives / (True Positives + False Negatives)", "True Negatives / (True Negatives + False Positives)", "True Positives / (True Positives + False Positives)", "(True Positives + True Negatives) / Total"],
-        "correct_option": 2,
-        "marks": 5
-    },
-    {
-        "id": "ml_q5",
-        "question_text": "How is the Recall (Sensitivity) metric defined in classification evaluation?",
-        "options": ["True Positives / (True Positives + False Positives)", "True Positives / (True Positives + False Negatives)", "False Positives / (False Positives + True Negatives)", "True Negatives / Total"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "ml_q6",
-        "question_text": "What metric represents the harmonic mean of Precision and Recall?",
-        "options": ["F1-Score", "ROC-AUC", "Accuracy", "Matthews Correlation Coefficient"],
+        "question_text": "Which optimization algorithm iteratively updates parameter weights in the opposite direction of the loss function gradient?",
+        "options": ["Gradient Descent", "Principal Component Analysis", "K-Means", "Random Forest"],
         "correct_option": 0,
         "marks": 5
     },
     {
+        "id": "ml_q5",
+        "question_text": "Which supervised algorithm finds an optimal hyperplane maximizing the margin between two distinct target classes?",
+        "options": ["Support Vector Machine (SVM)", "Naive Bayes", "Decision Tree", "K-Nearest Neighbors"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "ml_q6",
+        "question_text": "What is the mathematical harmonic mean of Precision and Recall?",
+        "options": ["ROC-AUC", "Mean Squared Error", "F1-Score", "Accuracy"],
+        "correct_option": 2,
+        "marks": 5
+    },
+    {
         "id": "ml_q7",
-        "question_text": "Which unsupervised algorithm partitions unlabeled data into K distinct clusters by minimizing distance to cluster centroids?",
-        "options": ["Decision Tree", "Logistic Regression", "Naive Bayes", "K-Means Clustering"],
-        "correct_option": 3,
+        "question_text": "Which unsupervised clustering technique assigns data points to K cluster centroids iteratively by minimizing squared Euclidean distances?",
+        "options": ["K-Means Clustering", "DBSCAN", "Hierarchical Clustering", "PCA"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q8",
-        "question_text": "Which optimization algorithm iteratively adjusts model parameters in the direction of steepest negative gradient of the loss function?",
-        "options": ["Simulated Annealing", "Gradient Descent", "Genetic Algorithm", "Grid Search"],
-        "correct_option": 1,
+        "question_text": "Which ensemble learning technique combines predictions from multiple independent decision trees built on bootstrap data samples?",
+        "options": ["Random Forest", "Logistic Regression", "Linear Regression", "Single Decision Tree"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q9",
-        "question_text": "What technique prevents overfitting by adding a penalty term (e.g. L1 or L2 norm) to the loss function to constrain weight magnitude?",
-        "options": ["Regularization", "Normalization", "One-Hot Encoding", "Data Imputation"],
+        "question_text": "What regularization method adds L1 penalty (absolute values of coefficients) to loss functions for feature selection?",
+        "options": ["Lasso Regularization", "Ridge Regularization", "ElasticNet", "Dropout"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q10",
-        "question_text": "Which model validation technique splits the dataset into K equal subsets, iteratively using K-1 folds for training and 1 fold for testing?",
-        "options": ["Bootstrap Sampling", "Holdout Validation", "K-Fold Cross-Validation", "Stratified Leave-One-Out"],
-        "correct_option": 2,
+        "question_text": "What regularization method adds L2 penalty (squared values of coefficients) to prevent weight explosion?",
+        "options": ["Ridge Regularization", "Lasso Regularization", "Early Stopping", "Batch Normalization"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q11",
-        "question_text": "Which linear classification algorithm finds the hyper-plane that maximizes the margin of separation between two target classes?",
-        "options": ["Random Forest", "Support Vector Machine (SVM)", "K-Nearest Neighbors", "Linear Regression"],
-        "correct_option": 1,
+        "question_text": "Which probabilistic classifier applies Bayes' Theorem with the strong assumption of conditional feature independence?",
+        "options": ["Naive Bayes", "Logistic Regression", "Random Forest", "Gradient Boosting"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q12",
-        "question_text": "Which ensemble machine learning algorithm constructs a multitude of decision trees using bootstrap aggregating (bagging)?",
-        "options": ["Random Forest", "Gradient Boosting Machine", "AdaBoost", "Single Decision Tree"],
+        "question_text": "What technique reduces high-dimensional data variance into orthogonal uncorrelated principal components?",
+        "options": ["Principal Component Analysis (PCA)", "t-SNE", "Linear Discriminant Analysis", "Factor Analysis"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q13",
-        "question_text": "Which linear dimensionality reduction method projects high-dimensional data onto orthogonal directions of maximum variance?",
-        "options": ["t-SNE", "Principal Component Analysis (PCA)", "LDA", "UMAP"],
-        "correct_option": 1,
+        "question_text": "What matrix tabular summary displays True Positives, False Positives, True Negatives, and False Negatives?",
+        "options": ["Confusion Matrix", "Correlation Matrix", "Covariance Matrix", "Feature Importance Table"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q14",
-        "question_text": "Which instance-based learning algorithm classifies new data points based on majority vote among its K nearest training examples?",
-        "options": ["Naive Bayes", "Logistic Regression", "K-Nearest Neighbors (KNN)", "Random Forest"],
-        "correct_option": 2,
+        "question_text": "What validation technique splits data into K subsets to evaluate model performance iteratively across all folds?",
+        "options": ["K-Fold Cross-Validation", "Holdout Validation", "Leave-One-Out", "Bootstrapping"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q15",
-        "question_text": "Which mathematical function maps any real number into an output value between 0 and 1, forming the core of logistic regression?",
-        "options": ["Sigmoid Function", "ReLU Function", "Hyperbolic Tangent (Tanh)", "Softmax"],
+        "question_text": "What curve plots True Positive Rate (Sensitivity) against False Positive Rate (1 - Specificity) across decision thresholds?",
+        "options": ["ROC Curve (Receiver Operating Characteristic)", "Precision-Recall Curve", "Learning Curve", "Scree Plot"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q16",
-        "question_text": "Which learning paradigm trains an agent to take sequential actions in an environment to maximize cumulative reward feedback?",
-        "options": ["Supervised Learning", "Unsupervised Learning", "Semi-Supervised Learning", "Reinforcement Learning"],
-        "correct_option": 3,
+        "question_text": "What non-parametric algorithm classifies test instances based on majority voting of their K nearest feature neighbors?",
+        "options": ["K-Nearest Neighbors (KNN)", "K-Means", "Kernel SVM", "Decision Tree"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q17",
-        "question_text": "What tabular layout visualizes performance by comparing actual target classes against predicted classes (TP, FP, TN, FN)?",
-        "options": ["Scatter Plot", "Confusion Matrix", "Correlation Matrix", "Box Plot"],
-        "correct_option": 1,
+        "question_text": "Which gradient boosting algorithm uses decision tree ensembles built sequentially to correct residual errors?",
+        "options": ["XGBoost / LightGBM", "Random Forest", "Bagging Classifier", "Voting Classifier"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q18",
-        "question_text": "What situation occurs when a machine learning model is too simple to capture complex relationships in the training data, causing high bias?",
-        "options": ["Underfitting", "Overfitting", "Data Leakage", "Gradient Explosion"],
+        "question_text": "What impurity metric measures the probability of a randomly chosen element being incorrectly labeled in Decision Trees?",
+        "options": ["Gini Impurity", "Entropy", "Variance", "Cross-Entropy"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q19",
-        "question_text": "What hyperparameter determines the magnitude of parameter updates at each step during gradient descent optimization?",
-        "options": ["Batch Size", "Epoch Count", "Learning Rate", "Momentum"],
-        "correct_option": 2,
+        "question_text": "What activation function squashes input values into a probabilistic range between 0.0 and 1.0 for binary logistic classification?",
+        "options": ["Sigmoid Function", "ReLU Function", "Tanh Function", "Softmax Function"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "ml_q20",
-        "question_text": "What data preprocessing method rescales features so they have a mean of 0 and standard deviation of 1?",
-        "options": ["Min-Max Scaling", "Standardization (Z-score Normalization)", "Log Transformation", "Binarization"],
-        "correct_option": 1,
+        "question_text": "What data preprocessing step scales features to zero mean and unit variance ($N(0, 1)$)?",
+        "options": ["Standardization (StandardScaler)", "Min-Max Normalization", "Robust Scaling", "Log Transformation"],
+        "correct_option": 0,
         "marks": 5
     }
 ]
@@ -307,142 +306,142 @@ ml_questions = [
 dl_questions = [
     {
         "id": "dl_q1",
-        "question_text": "What fundamental operation in Convolutional Neural Network layers extracts spatial feature maps by sliding filter weights across input tensors?",
-        "options": ["Discrete 2D Convolution", "Matrix Inversion", "Eigenvalue Decomposition", "Element-wise Division"],
+        "question_text": "Which mathematical operation forms the foundational building block of Convolutional Neural Networks for spatial feature extraction?",
+        "options": ["Discrete 2D Cross-Correlation / Convolution", "Matrix Inversion", "Eigenvalue Decomposition", "Fourier Transform"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q2",
-        "question_text": "Which non-linear activation function defined as f(x) = max(0, x) is widely used to prevent saturation in deep neural networks?",
-        "options": ["Sigmoid", "ReLU (Rectified Linear Unit)", "Tanh", "Softplus"],
-        "correct_option": 1,
+        "question_text": "What activation function outputs $f(x) = \max(0, x)$ to solve vanishing gradient problems in deep neural networks?",
+        "options": ["Rectified Linear Unit (ReLU)", "Sigmoid", "Hyperbolic Tangent (Tanh)", "Leaky ReLU"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q3",
-        "question_text": "Which pooling layer operation reduces spatial dimensions by selecting the maximum activation value within sliding sub-regions?",
-        "options": ["Max Pooling", "Average Pooling", "Global Sum Pooling", "Min Pooling"],
+        "question_text": "Which layer downsamples feature map spatial dimensions (width and height) by extracting maximum local window values?",
+        "options": ["MaxPooling2D", "AveragePooling2D", "GlobalAveragePooling", "Dense Layer"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q4",
-        "question_text": "Which algorithm computes gradients of the loss function with respect to every weight using the mathematical chain rule?",
-        "options": ["Forward Propagation", "Hebbian Learning", "Backpropagation", "Genetic Selection"],
-        "correct_option": 2,
+        "question_text": "What regularization technique randomly deactivates a fraction of neuron outputs during each training forward pass?",
+        "options": ["Dropout", "Batch Normalization", "Weight Decay", "L1 Regularization"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q5",
-        "question_text": "What issue occurs when gradients diminish exponentially as backpropagation proceeds through very deep neural network layers?",
-        "options": ["Exploding Gradients", "Vanishing Gradient Problem", "Internal Covariate Shift", "Overparameterization"],
-        "correct_option": 1,
+        "question_text": "What technique normalizes layer input activations across mini-batches to stabilize gradient flow and speed up training?",
+        "options": ["Batch Normalization", "Layer Normalization", "Instance Normalization", "Group Normalization"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q6",
-        "question_text": "What regularization technique randomly sets a subset of neuron activations to zero during each forward training pass?",
-        "options": ["Dropout", "Weight Decay", "L1 Regularization", "Early Stopping"],
+        "question_text": "Which algorithm computes loss function partial derivatives with respect to all layer weights using the mathematical chain rule?",
+        "options": ["Backpropagation", "Forward Pass", "Stochastic Gradient Descent", "Adam Optimizer"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q7",
-        "question_text": "Which layer normalizes intermediate activations across mini-batches to stabilize training and mitigate internal covariate shift?",
-        "options": ["Layer Normalization", "Group Normalization", "Batch Normalization", "Instance Normalization"],
-        "correct_option": 2,
+        "question_text": "Which activation function outputs a normalized probability distribution over multi-class target categories summing to 1.0?",
+        "options": ["Softmax Function", "Sigmoid Function", "ELU Function", "SELU Function"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q8",
-        "question_text": "Which activation function converts a vector of raw unnormalized logits into a multi-class probability distribution that sums to 1?",
-        "options": ["Sigmoid", "Softmax", "Leaky ReLU", "ELU"],
-        "correct_option": 1,
+        "question_text": "Which optimization algorithm combines adaptive learning rates for each parameter with exponential moving averages of past gradients and squared gradients?",
+        "options": ["Adam Optimizer", "RMSprop", "AdaGrad", "Standard SGD with Momentum"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q9",
-        "question_text": "What process fine-tunes a pre-trained deep learning backbone (e.g., ImageNet pre-trained CNN) on a specialized target dataset?",
-        "options": ["Transfer Learning", "Unsupervised Pre-training", "Meta-Learning", "Few-Shot Learning"],
+        "question_text": "What landmark CNN architecture introduced residual skip connections to successfully train extremely deep networks (e.g., 50 to 152 layers)?",
+        "options": ["ResNet", "AlexNet", "VGG-16", "LeNet-5"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q10",
-        "question_text": "Which CNN layer connects every neuron in the previous layer to every neuron in the next layer to generate final classification scores?",
-        "options": ["Convolutional Layer", "Pooling Layer", "Dropout Layer", "Fully Connected (Dense) Layer"],
-        "correct_option": 3,
+        "question_text": "What problem occurs during backpropagation in deep un-networked architectures when gradients shrink exponentially towards zero?",
+        "options": ["Vanishing Gradient Problem", "Exploding Gradient Problem", "Overfitting", "Dead Neurons"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q11",
-        "question_text": "Which CNN architecture introduced residual skip connections (shortcut connections) to enable training networks deeper than 100 layers?",
-        "options": ["AlexNet", "ResNet", "VGG16", "LeNet-5"],
-        "correct_option": 1,
+        "question_text": "What concept repurposes weights from a model pre-trained on large image datasets (ImageNet) for specialized target tasks?",
+        "options": ["Transfer Learning", "Domain Adaptation", "Few-Shot Learning", "Zero-Shot Learning"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q12",
-        "question_text": "What parameter in a convolutional layer defines the step size with which the kernel slides across the input image?",
-        "options": ["Stride", "Padding", "Dilation", "Receptive Field"],
+        "question_text": "Which loss function measures numerical divergence between target probability distributions and predicted class probabilities in multi-class classification?",
+        "options": ["Categorical Cross-Entropy Loss", "Mean Squared Error Loss", "Huber Loss", "Binary Cross-Entropy Loss"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q13",
-        "question_text": "What process adds zero-valued pixel borders around an input frame to maintain spatial dimensions after convolution?",
-        "options": ["Cropping", "Pooling", "Zero Padding", "Sharpening"],
-        "correct_option": 2,
+        "question_text": "What hyperparameter determines the spatial step distance a convolutional filter moves across an input matrix?",
+        "options": ["Stride", "Padding", "Dilation", "Kernel Size"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q14",
-        "question_text": "Which adaptive optimization algorithm combines concepts from both Momentum (first moment) and RMSprop (second moment)?",
-        "options": ["SGD", "Adam Optimizer", "Adagrad", "Nesterov SGD"],
-        "correct_option": 1,
+        "question_text": "What technique adds zero boundary pixels around an input image matrix to preserve spatial dimensions after convolution?",
+        "options": ["Same Padding", "Valid Padding", "Reflect Padding", "Zero Clipping"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q15",
-        "question_text": "What parameter defines the spatial dimensions (height x width) of learned feature detector matrices in a CNN layer?",
-        "options": ["Kernel / Filter Size", "Channel Count", "Feature Map Depth", "Batch Size"],
+        "question_text": "What spatial dimension reduction layer converts multi-channel 2D feature maps into a 1D vector before fully connected dense layers?",
+        "options": ["Flatten Layer", "Reshape Layer", "Permute Layer", "Embedding Layer"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q16",
-        "question_text": "Which deep architecture processes sequential temporal inputs using internal memory cells (e.g. LSTM / GRU)?",
-        "options": ["Standard CNN", "Autoencoder", "Transformer Encoder", "Recurrent Neural Network (RNN)"],
-        "correct_option": 3,
+        "question_text": "What recurrent neural network variant incorporates gating mechanisms (input, forget, output gates) to learn long-term temporal dependencies?",
+        "options": ["LSTM (Long Short-Term Memory)", "Vanilla RNN", "Transformers", "Autoencoders"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q17",
-        "question_text": "Which deep learning architecture introduced by Vaswani et al. relies exclusively on self-attention mechanisms without recurrence?",
-        "options": ["CNN", "Transformer", "GAN", "MLP"],
-        "correct_option": 1,
+        "question_text": "What lightweight CNN architecture utilizes depthwise separable convolutions for resource-constrained mobile and embedded vision applications?",
+        "options": ["MobileNet", "EfficientNet", "DenseNet", "InceptionNet"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q18",
-        "question_text": "Which framework consists of two neural networks (Generator and Discriminator) competing in an adversarial zero-sum game?",
-        "options": ["Generative Adversarial Network (GAN)", "Variational Autoencoder (VAE)", "Deep Q-Network (DQN)", "Siamese Network"],
+        "question_text": "What 1x1 convolution technique is used in architectures like Inception and ResNet bottleneck blocks to reduce channel depth?",
+        "options": ["1x1 Convolution (Pointwise Convolution)", "3x3 Depthwise Convolution", "Transposed Convolution", "Dilated Convolution"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q19",
-        "question_text": "What property enables CNNs to detect learned features regardless of where they appear within the input frame?",
-        "options": ["Rotation Invariance", "Scale Invariance", "Translation Invariance", "Affine Invariance"],
-        "correct_option": 2,
+        "question_text": "What technique artificially expands training set diversity using geometric transformations like random rotations, flips, and crops?",
+        "options": ["Data Augmentation", "Feature Extraction", "Normalisation", "Standardization"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "dl_q20",
-        "question_text": "What parameter specifies the number of training samples processed in one forward and backward pass before weight updates occur?",
-        "options": ["Epoch Count", "Batch Size", "Learning Rate", "Iteration Limit"],
-        "correct_option": 1,
+        "question_text": "What optimization technique stops neural network training when validation loss stops improving after a specified patience threshold?",
+        "options": ["Early Stopping", "Learning Rate Decay", "Gradient Clipping", "Weight Decay"],
+        "correct_option": 0,
         "marks": 5
     }
 ]
@@ -451,285 +450,285 @@ dl_questions = [
 yolo_questions = [
     {
         "id": "yolo_q1",
-        "question_text": "What is the primary architectural innovation of YOLO compared to region-proposal detectors like Faster R-CNN?",
-        "options": ["Single-stage architecture evaluating bounding boxes & class probabilities in one evaluation pass", "Two-stage region proposal extraction", "Sliding window exhaustive search", "Cascade filtering"],
+        "question_text": "What architectural distinction sets YOLO (You Only Look Once) apart from two-stage object detectors like Faster R-CNN?",
+        "options": ["Single-stage unified end-to-end grid regression", "Separate region proposal network (RPN) pass", "Selective search candidate bounding box extraction", "Feature pyramid slow pooling"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q2",
-        "question_text": "What metric quantifies spatial overlap ratio between a predicted bounding box and ground truth box?",
-        "options": ["Cosine Distance", "Intersection over Union (IoU)", "Hamming Loss", "Mean Absolute Deviation"],
-        "correct_option": 1,
+        "question_text": "What metric evaluates bounding box overlap accuracy by dividing intersection area over total union area?",
+        "options": ["Intersection over Union (IoU)", "Mean Average Precision (mAP)", "Dice Coefficient", "Structural Similarity Index"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q3",
-        "question_text": "Which post-processing algorithm filters out redundant overlapping bounding boxes pointing to the same object?",
-        "options": ["Non-Maximum Suppression (NMS)", "K-Means Filtering", "Spatial Pyramid Pooling", "Softmax Thresholding"],
+        "question_text": "Which post-processing step filters out redundant overlapping bounding boxes predicting the same object instance?",
+        "options": ["Non-Maximum Suppression (NMS)", "Bounding Box Regression", "Anchor Box Matching", "Feature Pyramid Network"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q4",
-        "question_text": "What pre-defined rectangular bounding boxes of varying aspect ratios serve as reference geometry in anchor-based object detectors?",
-        "options": ["Bounding Grids", "Receptive Fields", "Anchor Boxes", "Feature Maps"],
-        "correct_option": 2,
+        "question_text": "What pre-defined spatial aspect ratio templates are used in YOLO to predict bounding box offsets across different object scales?",
+        "options": ["Anchor Boxes / Prior Boxes", "Bounding Grids", "Feature Kernels", "Receptive Fields"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q5",
-        "question_text": "Which component in YOLO architecture is responsible for extracting feature representations at multiple spatial scales?",
-        "options": ["Head", "Backbone (e.g., CSPDarknet)", "Loss Layer", "NMS Filter"],
-        "correct_option": 1,
+        "question_text": "What primary benchmark metric measures object detector precision across multiple recall thresholds and class categories?",
+        "options": ["mAP (Mean Average Precision @ IoU 0.5:0.95)", "Accuracy", "F1-Score", "Pixel Recall"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q6",
-        "question_text": "Which intermediate YOLO module (e.g. PANet / FPN) combines feature maps from different backbone stages to enrich multi-scale context?",
-        "options": ["Neck", "Detection Head", "Anchor Generator", "Softmax Layer"],
+        "question_text": "What component in modern YOLO architectures fuses multi-scale features from different backbone stages before detection heads?",
+        "options": ["Neck (e.g., FPN / PANet)", "Backbone (e.g., DarkNet)", "Head (Anchorless / Anchor-based)", "Stem"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q7",
-        "question_text": "Which final stage of a YOLO detector predicts bounding box coordinates (x, y, w, h), objectness confidence, and class probabilities?",
-        "options": ["Backbone", "Neck", "Pre-processor", "Detection Head"],
-        "correct_option": 3,
+        "question_text": "What custom feature extractor backbone network was introduced in YOLOv2 and YOLOv3?",
+        "options": ["DarkNet (DarkNet-19 / DarkNet-53)", "ResNet-101", "VGG-19", "MobileNetV2"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q8",
-        "question_text": "Which evaluation metric computes the average precision across class categories and IoU thresholds in object detection benchmarks?",
-        "options": ["F1-Score", "mean Average Precision (mAP)", "Pixel Accuracy", "ROC-AUC"],
-        "correct_option": 1,
+        "question_text": "What loss function component penalizes discrepancies between predicted bounding box coordinates (x, y, w, h) and ground truth boxes?",
+        "options": ["Bounding Box Regression Loss (CIoU / GIoU Loss)", "Classification Loss", "Objectness Loss", "Focal Loss"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q9",
-        "question_text": "What standard IoU threshold is commonly applied in benchmark evaluations to classify a predicted box as a True Positive?",
-        "options": ["0.50 IoU", "0.10 IoU", "0.99 IoU", "0.05 IoU"],
+        "question_text": "What loss function addresses extreme foreground-background class imbalance in single-stage object detectors by down-weighting easy negative examples?",
+        "options": ["Focal Loss", "Cross-Entropy Loss", "Triplet Loss", "Smooth L1 Loss"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q10",
-        "question_text": "Which loss function variant (e.g. CIoU / GIoU) penalizes bounding box location, aspect ratio, and scale misalignment?",
-        "options": ["Cross-Entropy Loss", "Hinge Loss", "Complete IoU (CIoU) Loss", "Kullback-Leibler Divergence"],
-        "correct_option": 2,
+        "question_text": "What parameter in YOLO NMS thresholding determines the maximum allowable IoU overlap before a lower-confidence bounding box is discarded?",
+        "options": ["NMS IoU Threshold (e.g., 0.45)", "Confidence Threshold", "Score Cutoff", "Class Threshold"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q11",
-        "question_text": "Which lightweight model variant in the YOLO family is specifically optimized for low-latency inference on edge or mobile hardware?",
-        "options": ["YOLO-Extra Large", "YOLO-Nano / Tiny", "YOLO-Heavy", "YOLO-Cloud"],
-        "correct_option": 1,
+        "question_text": "What modern YOLO paradigm shift (introduced in YOLOv8) eliminates fixed anchor boxes to predict object centers directly?",
+        "options": ["Anchor-Free Detection", "Two-Stage Region Pooling", "Spatial Pyramid Matching", "Cascade Regression"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q12",
-        "question_text": "What benefit does Feature Pyramid Network (FPN) integration provide in modern YOLO architectures?",
-        "options": ["Improves detection accuracy for small objects by fusing high-resolution low-level features", "Eliminates need for GPU acceleration", "Converts 2D images to 3D models", "Reduces dataset training size"],
+        "question_text": "What augmentation technique mixes 4 distinct training images into a single 2x2 composite canvas to improve multi-scale detection?",
+        "options": ["Mosaic Augmentation", "MixUp Augmentation", "CutMix", "Random Erasing"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q13",
-        "question_text": "How does YOLO divide an input frame to perform localized bounding box predictions?",
-        "options": ["Sliding 1x1 windows", "Regular S x S grid cells", "Random region crops", "Concentric circular zones"],
-        "correct_option": 1,
+        "question_text": "What architectural block in YOLOv5/YOLOv8 reduces computational parameters while maintaining feature learning capacity using residual splits?",
+        "options": ["C3 / C2f Block (CSP Bottleneck)", "Dense Block", "Inception Block", "Squeeze-and-Excitation Block"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q14",
-        "question_text": "What does the objectness score in a YOLO bounding box prediction tensor represent?",
-        "options": ["Probability that a bounding box contains a target object multiplied by IoU", "Distance to screen border", "RGB color intensity", "Frame resolution"],
+        "question_text": "What output coordinate representation format is standard for YOLO bounding box ground truth annotations?",
+        "options": ["Normalized [x_center, y_center, width, height]", "Absolute [x_min, y_min, x_max, y_max]", "Pascal VOC XML Format", "COCO Polygon Coordinates"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q15",
-        "question_text": "What is the key difference between Object Classification and Object Localization?",
-        "options": ["Classification determines 'what' an object is; Localization determines 'where' it is located using coordinates", "Classification is faster than localization", "Localization only works on video", "There is no difference"],
+        "question_text": "What performance metric measures inference execution speed in object detection pipelines?",
+        "options": ["FPS (Frames Per Second)", "mAP", "GFLOPs", "IoU Ratio"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q16",
-        "question_text": "Which loss function dynamically down-weights easy negative background examples to focus on hard foreground objects during training?",
-        "options": ["MSE Loss", "Focal Loss", "L1 Loss", "Cosine Loss"],
-        "correct_option": 1,
+        "question_text": "What bounding box IoU loss variant incorporates distance between box centers, aspect ratio consistency, and overlap area?",
+        "options": ["Complete IoU Loss (CIoU)", "Generalized IoU (GIoU)", "Distance IoU (DIoU)", "Standard IoU"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q17",
-        "question_text": "What real-time frame processing speed (FPS) is typical for YOLO detectors on modern desktop GPUs?",
-        "options": ["30+ Frames Per Second (Real-time)", "1 Frame Per Minute", "0.5 Frames Per Second", "1000 Frames Per Second"],
+        "question_text": "What feature pyramid network enhancement passes feature signals bidirectionally (top-down and bottom-up) across network scales?",
+        "options": ["Path Aggregation Network (PANet)", "FPN", "BiFPN", "NAS-FPN"],
         "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q18",
-        "question_text": "Which computer vision task extends object detection by identifying exact pixel-level masks for each object instance?",
-        "options": ["Semantic Segmentation", "Image Classification", "Keypoint Estimation", "Instance Segmentation"],
-        "correct_option": 3,
+        "question_text": "In YOLO real-time proctoring applications, what class detection confidence threshold is typically configured to filter low-probability detections?",
+        "options": ["0.30 to 0.50 Confidence Threshold", "0.01 Threshold", "0.99 Threshold", "1.00 Threshold"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q19",
-        "question_text": "What data augmentation technique combines 4 training images into a single composite frame to improve YOLO scale robustness?",
-        "options": ["Random Cropping", "Mosaic Augmentation", "Color Jittering", "Gaussian Noise Addition"],
-        "correct_option": 1,
+        "question_text": "What quantization technique optimizes YOLO PyTorch weights into 8-bit integers (INT8) or TensorRT engines for high-speed edge deployment?",
+        "options": ["TensorRT / ONNX Model Quantization", "Model Pruning", "Knowledge Distillation", "Weight Decay"],
+        "correct_option": 0,
         "marks": 5
     },
     {
         "id": "yolo_q20",
-        "question_text": "Which end-to-end vision transformer architecture eliminates hand-designed components like NMS and anchor generation?",
-        "options": ["DETR (Detection Transformer)", "Faster R-CNN", "SSD", "YOLOv1"],
+        "question_text": "What primary advantage does YOLO offer for live webcam invigilation over complex multi-stage region proposal networks?",
+        "options": ["Ultra-high real-time frame rates (30+ FPS) suitable for continuous webcam stream monitoring", "Slower processing times", "Requires cloud supercomputers", "Only works on static offline images"],
         "correct_option": 0,
         "marks": 5
     }
 ]
 
-# Set 5: Test 5: AI-Based Online Proctoring (20 Questions)
-proc_questions = [
+# Set 5: Test 5: Data Structures and Algorithms (20 Questions)
+dsa_questions = [
     {
-        "id": "proc_q1",
-        "question_text": "What is the primary objective of deploying AI computer vision systems in online proctored examinations?",
-        "options": ["Continuously monitoring candidate session integrity and detecting rule violations to ensure assessment fairness", "Automatically writing exam questions", "Replacing Internet service providers", "Accelerating keyboard typing speeds"],
+        "id": "dsa_q1",
+        "question_text": "What is the worst-case time complexity of accessing an element by its index in a contiguous array?",
+        "options": ["O(1)", "O(N)", "O(log N)", "O(N^2)"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q2",
-        "question_text": "Which violation category is triggered when an AI vision detector identifies more than one human face within the webcam view?",
-        "options": ["EXTERNAL_DEVICE", "MULTIPLE_PERSONS", "HEAD_MOVEMENT", "TALKING"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "proc_q3",
-        "question_text": "Which violation category is logged when rectangular handheld object signatures or mobile phones are detected?",
-        "options": ["EXTERNAL_DEVICE", "HEAD_MOVEMENT", "TALKING", "NORMAL"],
+        "id": "dsa_q2",
+        "question_text": "Which data structure operates on a Last-In, First-Out (LIFO) principle?",
+        "options": ["Stack", "Queue", "Priority Queue", "Linked List"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q4",
-        "question_text": "Which violation category flags candidate gaze offsets exceeding yaw/pitch thresholds relative to screen center?",
-        "options": ["MULTIPLE_PERSONS", "TALKING", "HEAD_MOVEMENT", "EXTERNAL_DEVICE"],
-        "correct_option": 2,
-        "marks": 5
-    },
-    {
-        "id": "proc_q5",
-        "question_text": "Which violation category monitors visual mouth aspect ratio (MAR) variations indicative of continuous speech or whispering?",
-        "options": ["HEAD_MOVEMENT", "TALKING", "EXTERNAL_DEVICE", "MULTIPLE_PERSONS"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "proc_q6",
-        "question_text": "What baseline status is maintained when a candidate remains focused and compliant with all exam rules?",
-        "options": ["NORMAL (✓ AI Monitoring: Normal)", "FLAGGED", "SUSPICIOUS", "CRITICAL"],
+        "id": "dsa_q3",
+        "question_text": "Which data structure operates on a First-In, First-Out (FIFO) principle?",
+        "options": ["Queue", "Stack", "Binary Search Tree", "Max Heap"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q7",
-        "question_text": "What is the configured risk score weight added to a candidate session upon detecting an EXTERNAL_DEVICE violation?",
-        "options": ["5 Points", "10 Points", "15 Points", "25 Points"],
-        "correct_option": 3,
-        "marks": 5
-    },
-    {
-        "id": "proc_q8",
-        "question_text": "What is the configured risk score weight added to a candidate session upon detecting a MULTIPLE_PERSONS violation?",
-        "options": ["5 Points", "30 Points", "10 Points", "20 Points"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "proc_q9",
-        "question_text": "What risk score weight is assigned to a TALKING mouth movement warning in the proctoring pipeline?",
-        "options": ["10 Points", "25 Points", "30 Points", "2 Points"],
+        "id": "dsa_q4",
+        "question_text": "What is the time complexity of inserting a new node at the head of a singly linked list if head pointer is known?",
+        "options": ["O(1)", "O(N)", "O(log N)", "O(N log N)"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q10",
-        "question_text": "What risk score weight is assigned to a HEAD_MOVEMENT gaze offset warning in the proctoring pipeline?",
-        "options": ["15 Points", "30 Points", "5 Points", "25 Points"],
-        "correct_option": 2,
-        "marks": 5
-    },
-    {
-        "id": "proc_q11",
-        "question_text": "What is the primary function of a temporal anti-spam cooldown buffer (e.g., 4 seconds) in backend violation logging?",
-        "options": ["Preventing duplicate database records from rapid consecutive video frames", "Shutting down the server", "Deleting student answers", "Increasing webcam video frame rate"],
+        "id": "dsa_q5",
+        "question_text": "Which binary tree traversal order visits nodes in ascending sorted order for a Binary Search Tree (BST)?",
+        "options": ["In-order Traversal", "Pre-order Traversal", "Post-order Traversal", "Level-order Traversal"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q12",
-        "question_text": "What is the maximum warning threshold after which an online candidate session is automatically flagged for examiner review?",
-        "options": ["1 Warning", "3 Warnings", "50 Warnings", "10 Warnings"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "proc_q13",
-        "question_text": "What is the primary role of human examiner dashboards in automated AI invigilation workflows?",
-        "options": ["Reviewing flagged audit logs, violation timelines, and risk scores to make authoritative integrity decisions", "Writing code for the AI model", "Replacing the database server", "Grading multiple choice questions manually"],
+        "id": "dsa_q6",
+        "question_text": "What is the average-case search time complexity in a balanced Binary Search Tree (e.g., AVL tree)?",
+        "options": ["O(log N)", "O(N)", "O(1)", "O(N^2)"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q14",
-        "question_text": "Which ethical AI principle requires transparent candidate consent, data encryption, and restricted video retention boundaries?",
-        "options": ["Black-box Deployment", "Unrestricted Surveillance", "Data Privacy & Algorithmic Fairness", "Automated Disqualification"],
-        "correct_option": 2,
-        "marks": 5
-    },
-    {
-        "id": "proc_q15",
-        "question_text": "What pre-exam verification step confirms candidate identity before launching the proctored test environment?",
-        "options": ["Webcam permission check & candidate ID authorization", "Payment gateway check", "Speed test check", "Browser theme check"],
+        "id": "dsa_q7",
+        "question_text": "What is the average-case search and insertion time complexity of a Hash Table with good hash distribution?",
+        "options": ["O(1)", "O(N)", "O(log N)", "O(N^2)"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q16",
-        "question_text": "Which risk category is assigned when a candidate's accumulated risk score reaches or exceeds 75%?",
-        "options": ["CRITICAL", "LOW", "MEDIUM", "SAFE"],
+        "id": "dsa_q8",
+        "question_text": "What is the average-case time complexity of QuickSort algorithm?",
+        "options": ["O(N log N)", "O(N^2)", "O(N)", "O(log N)"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q17",
-        "question_text": "Which MongoDB collection stores timestamped proctoring violation logs (exam_id, student_id, violation_type, confidence)?",
-        "options": ["db.users", "db.violations", "db.questions", "db.logs"],
-        "correct_option": 1,
-        "marks": 5
-    },
-    {
-        "id": "proc_q18",
-        "question_text": "Which MongoDB collection tracks ongoing candidate exam session status, active time, warning count, and risk score?",
-        "options": ["db.exam_attempts", "db.reports", "db.exams", "db.sessions"],
+        "id": "dsa_q9",
+        "question_text": "Which sorting algorithm guarantees a worst-case time complexity of O(N log N) using a divide-and-conquer strategy?",
+        "options": ["MergeSort", "BubbleSort", "InsertionSort", "QuickSort"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q19",
-        "question_text": "What feature enables examiners to export official candidate proctoring audit reports for integrity hearings?",
-        "options": ["Print / Save PDF Audit Report", "CSV Database Dump", "Webcam Video Re-encode", "Source Code Export"],
+        "id": "dsa_q10",
+        "question_text": "Which algorithm strategy or data structure is used to implement Depth-First Search (DFS) iteratively?",
+        "options": ["Stack", "Queue", "Min-Heap", "Hash Map"],
         "correct_option": 0,
         "marks": 5
     },
     {
-        "id": "proc_q20",
-        "question_text": "What benefit does automated AI proctoring offer educational institutions during large-scale remote assessments?",
-        "options": ["Scalable, objective, and consistent integrity monitoring without requiring one-to-one human proctors per candidate", "100% elimination of exam questions", "Automatic 100% scores for all students", "Faster internet connection speeds"],
+        "id": "dsa_q11",
+        "question_text": "Which algorithm strategy or data structure is used to implement Breadth-First Search (BFS) on graphs?",
+        "options": ["Queue", "Stack", "Binary Search Tree", "Array List"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q12",
+        "question_text": "In a Min-Heap binary tree implementation, what element is always located at the root node?",
+        "options": ["The minimum element", "The maximum element", "The median element", "The last inserted element"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q13",
+        "question_text": "Which graph algorithm finds single-source shortest paths in a directed graph with non-negative edge weights?",
+        "options": ["Dijkstra's Algorithm", "Floyd-Warshall Algorithm", "Kruskal's Algorithm", "Bellman-Ford Algorithm"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q14",
+        "question_text": "What two core properties characterize problems suitable for Dynamic Programming optimization?",
+        "options": ["Overlapping Subproblems and Optimal Substructure", "Greedy Choice and Sorting", "Divide & Conquer with Zero Overlap", "Linearity and Monotonicity"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q15",
+        "question_text": "How does a Circular Queue handle buffer wrap-around when inserting new elements?",
+        "options": ["Using modulo arithmetic operator ((rear + 1) % capacity)", "Reallocating double array size", "Shifting all elements left", "Deleting root element"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q16",
+        "question_text": "What structural feature distinguishes a Doubly Linked List node from a Singly Linked List node?",
+        "options": ["Pointers to both Next and Previous nodes", "Pointer only to Next node", "No pointers", "Two data value fields"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q17",
+        "question_text": "What is the auxiliary space complexity required to store a graph with V vertices using an Adjacency Matrix?",
+        "options": ["O(V^2)", "O(V + E)", "O(E^2)", "O(V)"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q18",
+        "question_text": "What is the maximum number of nodes at depth level 'k' (where root level is 0) in a Binary Tree?",
+        "options": ["2^k", "2^(k+1)", "k^2", "2k"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q19",
+        "question_text": "Which classic algorithm converts an Infix mathematical expression into a Postfix (Reverse Polish Notation) expression using a stack?",
+        "options": ["Dijkstra's Shunting Yard Algorithm", "Kadane's Algorithm", "KMP Algorithm", "Rabin-Karp Algorithm"],
+        "correct_option": 0,
+        "marks": 5
+    },
+    {
+        "id": "dsa_q20",
+        "question_text": "What type of graph is required for a valid Topological Sort ordering of vertices?",
+        "options": ["Directed Acyclic Graph (DAG)", "Undirected Cyclic Graph", "Complete Bipartite Graph", "Weighted Tree"],
         "correct_option": 0,
         "marks": 5
     }
@@ -777,14 +776,14 @@ exams_list = [
         "questions": yolo_questions
     },
     {
-        "title": "Test 5: AI-Based Online Proctoring",
-        "description": "Comprehensive exam on continuous video invigilation, multi-class anomaly detection, temporal consecutive-frame verification, risk index calculation, and ethical AI.",
+        "title": "Test 5: Data Structures and Algorithms",
+        "description": "Comprehensive evaluation covering arrays, linked lists, stacks, queues, trees, graph algorithms, sorting, hashing, and time complexity analysis.",
         "duration_minutes": 45,
         "total_marks": 100,
         "passing_marks": 40,
         "is_active": True,
         "created_by": "admin_system",
-        "questions": proc_questions
+        "questions": dsa_questions
     }
 ]
 
@@ -808,6 +807,9 @@ async def seed_database():
         }
         await db.users.insert_one(admin_doc)
         logger.info(f"Created demo admin account: {admin_email} / admin123")
+    else:
+        # Ensure password hash is updated to admin123
+        await db.users.update_one({"email": admin_email}, {"$set": {"hashed_password": get_password_hash("admin123"), "is_active": True}})
 
     # Seed Student User
     student_email = "student@example.com"
@@ -824,9 +826,13 @@ async def seed_database():
         }
         await db.users.insert_one(student_doc)
         logger.info(f"Created demo student account: {student_email} / student123")
+    else:
+        # Ensure password hash is updated to student123
+        await db.users.update_one({"email": student_email}, {"$set": {"hashed_password": get_password_hash("student123"), "is_active": True}})
 
     # Seed 5 Distinct Examinations
-    # Clean up legacy old single sample exam if present
+    # Clean up legacy old sample exams if present
+    await db.exams.delete_many({"title": "Test 5: AI-Based Online Proctoring"})
     await db.exams.delete_many({"title": "Computer Vision & AI Final Assessment 2026"})
 
     for exam_data in exams_list:
@@ -839,7 +845,7 @@ async def seed_database():
             logger.info(f"Updated exam '{exam_data['title']}' with ID: {existing_exam['_id']}")
 
     client.close()
-    logger.info("Database seeding complete for all 5 examinations!")
+    logger.info("Database seeding complete for all 5 examinations (20 questions each)!")
 
 if __name__ == "__main__":
     asyncio.run(seed_database())

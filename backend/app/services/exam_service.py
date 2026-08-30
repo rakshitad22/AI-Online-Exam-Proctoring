@@ -8,33 +8,13 @@ from app.schemas.exam import ExamCreate, SubmitExamRequest
 
 logger = logging.getLogger("ai_proctoring.exam_service")
 
-DEFAULT_SAMPLE_EXAM = {
-    "_id": "exam_sample_01",
-    "id": "exam_sample_01",
-    "title": "Computer Science & AI Fundamentals Exam",
-    "description": "Comprehensive live proctored evaluation covering Machine Learning, Data Structures, and System Architecture.",
-    "duration_minutes": 30,
-    "total_marks": 20,
-    "passing_marks": 8,
-    "is_active": True,
-    "question_count": 2,
-    "questions": [
-        {
-            "id": "q1",
-            "question_text": "Which algorithm is commonly used for real-time object detection in webcam video frames?",
-            "options": ["YOLO (You Only Look Once)", "Dijkstra's Algorithm", "Binary Search", "Bubble Sort"],
-            "correct_option": 0,
-            "marks": 10
-        },
-        {
-            "id": "q2",
-            "question_text": "In online exam proctoring, what indicator triggers a MULTIPLE_PERSONS violation?",
-            "options": ["Background audio music", "More than 1 face detected in frame", "Closing the tab", "Low battery level"],
-            "correct_option": 1,
-            "marks": 10
-        }
-    ]
-}
+try:
+    from seed_data import exams_list as DEFAULT_EXAMS_LIST
+except ImportError:
+    try:
+        from backend.seed_data import exams_list as DEFAULT_EXAMS_LIST
+    except ImportError:
+        DEFAULT_EXAMS_LIST = []
 
 def to_jsonable_dict(doc: dict) -> dict:
     if not isinstance(doc, dict):
@@ -88,8 +68,14 @@ async def get_all_exams() -> List[dict]:
         except Exception as err:
             logger.warning(f"get_all_exams DB notice: {err}")
     
-    if not exams:
-        exams.append(DEFAULT_SAMPLE_EXAM)
+    if not exams and DEFAULT_EXAMS_LIST:
+        for ex in DEFAULT_EXAMS_LIST:
+            clean_ex = to_jsonable_dict(dict(ex))
+            clean_ex["_id"] = clean_ex.get("_id", "exam_" + clean_ex["title"].lower().replace(" ", "_").replace(":", ""))
+            clean_ex["id"] = clean_ex["_id"]
+            clean_ex["question_count"] = len(clean_ex.get("questions", []))
+            exams.append(clean_ex)
+            
     return exams
 
 async def get_exam_by_id(exam_id: str) -> dict:
@@ -110,9 +96,24 @@ async def get_exam_by_id(exam_id: str) -> dict:
         except Exception as err:
             logger.error(f"get_exam_by_id DB notice: {err}")
     
-    if exam_id == DEFAULT_SAMPLE_EXAM["id"] or exam_id == DEFAULT_SAMPLE_EXAM["_id"]:
-        return DEFAULT_SAMPLE_EXAM
-    return DEFAULT_SAMPLE_EXAM
+    # Fallback matching by ID or title slug
+    if DEFAULT_EXAMS_LIST:
+        for ex in DEFAULT_EXAMS_LIST:
+            slug = "exam_" + ex["title"].lower().replace(" ", "_").replace(":", "")
+            if exam_id == slug or exam_id == ex.get("_id") or exam_id == ex.get("id"):
+                clean_ex = to_jsonable_dict(dict(ex))
+                clean_ex["_id"] = slug
+                clean_ex["id"] = slug
+                clean_ex["question_count"] = len(clean_ex.get("questions", []))
+                return clean_ex
+        # Return first exam if ID not matched
+        clean_ex = to_jsonable_dict(dict(DEFAULT_EXAMS_LIST[0]))
+        clean_ex["_id"] = exam_id
+        clean_ex["id"] = exam_id
+        clean_ex["question_count"] = len(clean_ex.get("questions", []))
+        return clean_ex
+
+    raise HTTPException(status_code=404, detail="Exam not found")
 
 async def update_exam(exam_id: str, exam_data: dict) -> dict:
     db = get_database()
@@ -178,7 +179,7 @@ async def submit_exam_and_evaluate(req: SubmitExamRequest, student_id: str, stud
     
     for q in questions:
         q_id = str(q.get("id"))
-        marks = q.get("marks", 1)
+        marks = q.get("marks", 5)
         total_possible += marks
         correct_opt = q.get("correct_option")
         user_ans = req.answers.get(q_id)

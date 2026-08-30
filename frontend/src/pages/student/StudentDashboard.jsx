@@ -46,9 +46,9 @@ const fallback5Exams = [
     question_count: 20
   },
   {
-    id: 'exam_demo_proc',
-    title: 'Test 5: AI-Based Online Proctoring',
-    description: 'Comprehensive exam on continuous video invigilation, multi-class anomaly detection, temporal consecutive-frame verification, risk index calculation, and ethical AI.',
+    id: 'exam_demo_dsa',
+    title: 'Test 5: Data Structures and Algorithms',
+    description: 'Comprehensive evaluation covering arrays, linked lists, stacks, queues, trees, graph algorithms, sorting, hashing, and time complexity analysis.',
     duration_minutes: 45,
     total_marks: 100,
     passing_marks: 40,

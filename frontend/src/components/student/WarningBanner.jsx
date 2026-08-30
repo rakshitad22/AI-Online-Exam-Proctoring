@@ -7,7 +7,7 @@ const WarningBanner = ({ warningsCount = 0, maxWarnings = 3, latestMessage, late
   let title = 'AI MONITORING LIVE';
 
   const isRedAlert = latestActivity === 'EXTERNAL_DEVICE' || latestActivity === 'MULTIPLE_PERSONS' || warningsCount >= maxWarnings;
-  const isYellowAlert = latestActivity === 'HEAD_MOVEMENT' || latestActivity === 'TALKING';
+  const isYellowAlert = latestActivity === 'HEAD_MOVEMENT' || latestActivity === 'TALKING' || latestActivity === 'BACKGROUND_NOISE';
 
   if (isRedAlert) {
     bannerStyle = 'bg-rose-950/60 border-rose-500/80 text-rose-200 animate-pulse shadow-rose-900/50 shadow-lg';
@@ -24,6 +24,7 @@ const WarningBanner = ({ warningsCount = 0, maxWarnings = 3, latestMessage, late
     if (latestActivity === 'MULTIPLE_PERSONS') return '⚠ Multiple Persons Detected!';
     if (latestActivity === 'HEAD_MOVEMENT') return '⚠ Excessive Head Movement Detected';
     if (latestActivity === 'TALKING') return '⚠ Talking / Mouth Movement Detected';
+    if (latestActivity === 'BACKGROUND_NOISE') return '⚠ Background Noise / Suspicious Audio Detected';
     if (latestActivity === 'NORMAL') return '✓ AI Monitoring: Normal';
     return latestMessage || 'AI proctoring system active.';
   };
