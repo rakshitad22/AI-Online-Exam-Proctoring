@@ -26,11 +26,17 @@ class VercelPathRewriteMiddleware:
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http":
-            query_string = scope.get("query_string", b"").decode("utf-8")
-            params = parse_qs(query_string)
-            if "__path__" in params and params["__path__"]:
-                raw_target = params["__path__"][0]
-                scope["path"] = raw_target if raw_target.startswith("/") else f"/{raw_target}"
+            headers = dict(scope.get("headers", []))
+            x_forwarded_uri = headers.get(b"x-forwarded-uri", b"").decode("utf-8")
+            if x_forwarded_uri and not x_forwarded_uri.startswith("/api/index.py") and not x_forwarded_uri.startswith("/index.py"):
+                target_path = x_forwarded_uri.split("?")[0]
+                scope["path"] = target_path if target_path.startswith("/") else f"/{target_path}"
+            else:
+                query_string = scope.get("query_string", b"").decode("utf-8")
+                params = parse_qs(query_string)
+                if "__path__" in params and params["__path__"]:
+                    raw_target = params["__path__"][0]
+                    scope["path"] = raw_target if raw_target.startswith("/") else f"/{raw_target}"
         await self.app(scope, receive, send)
 
 app = FastAPI(
