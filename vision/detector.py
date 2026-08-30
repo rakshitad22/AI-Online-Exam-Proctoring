@@ -21,13 +21,6 @@ logger = logging.getLogger("vision.detector")
 class AbnormalActivityDetector:
     """
     Real Computer Vision & AI Abnormal Activity Detector for Online Exam Proctoring.
-    
-    Classifies 5 Target Classes:
-    1. Normal exam behavior
-    2. External device / mobile phone
-    3. Head movement
-    4. Multiple persons
-    5. Talking to another person
     """
 
     CLASS_NORMAL = "Normal exam behavior"
@@ -42,7 +35,6 @@ class AbnormalActivityDetector:
         self.profile_face_cascade = None
         self.smile_cascade = None
         
-        # Frame history queues for temporal consecutive-frame verification
         self.head_pose_history = deque(maxlen=history_size)
         self.mouth_motion_history = deque(maxlen=history_size)
         self.multi_person_history = deque(maxlen=history_size)
@@ -50,16 +42,12 @@ class AbnormalActivityDetector:
         
         self.prev_frame_gray = None
         
-        # Detection thresholds
         self.head_yaw_threshold = 0.22
         self.head_pitch_threshold = 0.25
         self.talking_mar_threshold = 0.35
         self.consecutive_frames_required = 2
 
     def load_model(self):
-        """
-        Loads OpenCV Haar Cascades lazily if OpenCV is installed.
-        """
         if self.is_loaded:
             return
 
@@ -92,14 +80,10 @@ class AbnormalActivityDetector:
             self.is_loaded = True
 
     def process_frame(self, frame_bytes: bytes) -> Dict[str, Any]:
-        """
-        Processes an incoming webcam image frame and returns real CV detection results.
-        """
         if not self.is_loaded:
             self.load_model()
 
         try:
-            # Decode frame
             if isinstance(frame_bytes, bytes):
                 frame_str = frame_bytes.decode('utf-8')
             else:
@@ -112,8 +96,7 @@ class AbnormalActivityDetector:
             img_bgr = resize_frame_for_inference(img_bgr, target_width=640)
             h, w = img_bgr.shape[:2]
 
-            # If OpenCV present, use Haar Cascades
-            if HAS_OPENCV and cv2 is not None and self.face_cascade and not self.face_cascade.empty():
+            if HAS_OPENCV and cv2 is not None and self.face_cascade and not self.face_cascade.empty() and h >= 80 and w >= 80:
                 gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
                 gray_eq = cv2.equalizeHist(gray)
 
@@ -157,7 +140,6 @@ class AbnormalActivityDetector:
                         "details": {"person_count": person_count}
                     }
 
-            # Normal behavior default
             return {
                 "is_suspicious": False,
                 "detected_class": self.CLASS_NORMAL,
