@@ -28,13 +28,10 @@ app = FastAPI(
 
 @app.middleware("http")
 async def fix_vercel_path_middleware(request: Request, call_next):
-    raw_path = request.url.path
-    if raw_path.startswith("/api/index.py"):
-        suffix = raw_path[len("/api/index.py"):]
-        request.scope["path"] = suffix if suffix else "/"
-    elif raw_path.startswith("/api/index"):
-        suffix = raw_path[len("/api/index"):]
-        request.scope["path"] = suffix if suffix else "/"
+    matched_path = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
+    if matched_path:
+        clean_path = matched_path.split("?")[0]
+        request.scope["path"] = clean_path
     return await call_next(request)
 
 cors_origins = settings.BACKEND_CORS_ORIGINS or ["*"]
