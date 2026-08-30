@@ -7,6 +7,8 @@ router = APIRouter()
 @router.get("/", response_model=List[dict])
 async def list_students():
     db = get_database()
+    if db is None:
+        return []
     users = []
     cursor = db.users.find({"role": "student"})
     async for u in cursor:
