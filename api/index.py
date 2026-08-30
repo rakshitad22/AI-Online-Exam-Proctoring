@@ -1,7 +1,6 @@
 import sys
 from pathlib import Path
 
-# Add project root and backend directory to sys.path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT_DIR / "backend"
 
