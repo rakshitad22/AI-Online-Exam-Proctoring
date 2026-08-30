@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from app.core.database import get_database
 from app.core.config import settings
 
