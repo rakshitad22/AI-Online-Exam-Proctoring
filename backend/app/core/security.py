@@ -37,10 +37,13 @@ def create_access_token(
     to_encode = {"exp": expire, "sub": str(subject), "role": role}
     
     if HAS_JOSE:
-        encoded_jwt = jwt.encode(
-            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-        )
-        return encoded_jwt
+        try:
+            encoded_jwt = jwt.encode(
+                to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+            )
+            return encoded_jwt
+        except Exception as err:
+            logger.warning(f"jose jwt encode fallback: {err}")
     
     import base64, json
     header = {"alg": "HS256", "typ": "JWT"}
