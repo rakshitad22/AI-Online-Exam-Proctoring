@@ -26,6 +26,13 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+@app.middleware("http")
+async def fix_vercel_path_middleware(request: Request, call_next):
+    path_param = request.query_params.get("__path__") or request.headers.get("x-forwarded-uri")
+    if path_param:
+        request.scope["path"] = path_param
+    return await call_next(request)
+
 cors_origins = settings.BACKEND_CORS_ORIGINS or ["*"]
 app.add_middleware(
     CORSMiddleware,
@@ -45,12 +52,4 @@ def root():
         "version": "1.0.0",
         "docs": "/docs",
         "message": "AI Proctoring API Active on Vercel Serverless."
-    }
-
-@app.get("/debug-headers", tags=["Diagnostic"])
-def debug_headers(request: Request):
-    return {
-        "scope_path": request.scope.get("path"),
-        "url_path": request.url.path,
-        "headers": dict(request.headers)
     }
