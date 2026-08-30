@@ -1,9 +1,8 @@
 import sys
 import logging
 from pathlib import Path
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.docs import get_swagger_ui_html
 
 # Ensure backend directory is in sys.path
 BACKEND_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +19,16 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Middleware to fix path rewrites on Vercel Serverless
+# Middleware to unwrap Vercel path rewrites accurately
 @app.middleware("http")
 async def fix_vercel_path_middleware(request: Request, call_next):
-    forwarded_path = request.headers.get("x-forwarded-uri") or request.headers.get("x-matched-path")
-    if forwarded_path:
-        clean_path = forwarded_path.split("?")[0]
-        request.scope["path"] = clean_path
+    raw_path = request.url.path
+    if raw_path.startswith("/api/index.py"):
+        suffix = raw_path[len("/api/index.py"):]
+        request.scope["path"] = suffix if suffix else "/"
+    elif raw_path.startswith("/api/index"):
+        suffix = raw_path[len("/api/index"):]
+        request.scope["path"] = suffix if suffix else "/"
     return await call_next(request)
 
 # Configure CORS
