@@ -1,4 +1,5 @@
 import sys
+import logging
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -11,5 +12,21 @@ if BACKEND_DIR.exists() and str(BACKEND_DIR) not in sys.path:
 
 try:
     from backend.app.main import app
-except ImportError:
-    from app.main import app
+except Exception as err:
+    try:
+        from app.main import app
+    except Exception as err2:
+        logging.exception(f"Failed to import app.main on Vercel root handler: {err2}")
+        from fastapi import FastAPI
+        app = FastAPI(title="AI Proctoring System - Serverless Gateway")
+
+        @app.get("/")
+        @app.get("/docs")
+        @app.get("/{full_path:path}")
+        def serverless_fallback(full_path: str = ""):
+            return {
+                "project": "AI Online Exam Proctoring System",
+                "status": "error",
+                "error_details": f"{str(err)} | {str(err2)}",
+                "message": "Serverless Function startup notice."
+            }
