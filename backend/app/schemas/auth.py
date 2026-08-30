@@ -1,5 +1,5 @@
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
 
 class Token(BaseModel):
     access_token: str
@@ -14,13 +14,13 @@ class TokenData(BaseModel):
     role: Optional[str] = None
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
     full_name: str
-    role: str = "student" # "student" or "admin"
+    role: str = "student"
     student_id: Optional[str] = None
     department: Optional[str] = None

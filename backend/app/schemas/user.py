@@ -1,9 +1,9 @@
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str
     full_name: str
     role: str = "student"
     student_id: Optional[str] = None
