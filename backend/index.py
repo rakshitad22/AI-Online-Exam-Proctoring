@@ -1,7 +1,8 @@
 import sys
 import logging
 from pathlib import Path
-from fastapi import FastAPI, Request
+from urllib.parse import parse_qs
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 CURRENT_DIR = Path(__file__).resolve().parent
@@ -11,6 +12,19 @@ if str(CURRENT_DIR) not in sys.path:
 from app.core.config import settings
 from app.api.v1.api import api_router
 
+class VercelPathRewriteMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            query_string = scope.get("query_string", b"").decode("utf-8")
+            params = parse_qs(query_string)
+            if "__path__" in params and params["__path__"]:
+                raw_target = params["__path__"][0]
+                scope["path"] = raw_target if raw_target.startswith("/") else f"/{raw_target}"
+        await self.app(scope, receive, send)
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url="/api/v1/openapi.json",
@@ -18,12 +32,7 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-@app.middleware("http")
-async def fix_vercel_path_middleware(request: Request, call_next):
-    path_param = request.query_params.get("__path__") or request.headers.get("x-forwarded-uri")
-    if path_param:
-        request.scope["path"] = path_param
-    return await call_next(request)
+app.add_middleware(VercelPathRewriteMiddleware)
 
 cors_origins = settings.BACKEND_CORS_ORIGINS or ["*"]
 app.add_middleware(

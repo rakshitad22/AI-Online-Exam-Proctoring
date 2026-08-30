@@ -1,7 +1,8 @@
 import sys
 import logging
 from pathlib import Path
-from fastapi import FastAPI, Request
+from urllib.parse import parse_qs
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Ensure root and backend directories are in sys.path
@@ -20,6 +21,20 @@ except ImportError:
     from app.core.config import settings
     from app.api.v1.api import api_router
 
+# Pure ASGI Middleware to update scope["path"] BEFORE Starlette route matching
+class VercelPathRewriteMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            query_string = scope.get("query_string", b"").decode("utf-8")
+            params = parse_qs(query_string)
+            if "__path__" in params and params["__path__"]:
+                raw_target = params["__path__"][0]
+                scope["path"] = raw_target if raw_target.startswith("/") else f"/{raw_target}"
+        await self.app(scope, receive, send)
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     openapi_url="/api/v1/openapi.json",
@@ -27,13 +42,8 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Middleware to resolve Vercel __path__ query parameter
-@app.middleware("http")
-async def fix_vercel_path_middleware(request: Request, call_next):
-    path_param = request.query_params.get("__path__") or request.headers.get("x-forwarded-uri")
-    if path_param:
-        request.scope["path"] = path_param
-    return await call_next(request)
+# Add Vercel ASGI rewrite middleware
+app.add_middleware(VercelPathRewriteMiddleware)
 
 # Configure CORS
 cors_origins = settings.BACKEND_CORS_ORIGINS or ["*"]
