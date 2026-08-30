@@ -8,6 +8,26 @@ from app.schemas.exam import ExamCreate, SubmitExamRequest
 
 logger = logging.getLogger("ai_proctoring.exam_service")
 
+def to_jsonable_dict(doc: dict) -> dict:
+    if not isinstance(doc, dict):
+        return doc
+    clean = {}
+    for k, v in doc.items():
+        if isinstance(v, ObjectId):
+            clean[k] = str(v)
+        elif isinstance(v, datetime):
+            clean[k] = v.isoformat()
+        elif isinstance(v, list):
+            clean[k] = [to_jsonable_dict(item) if isinstance(item, dict) else (str(item) if isinstance(item, ObjectId) else item) for item in v]
+        elif isinstance(v, dict):
+            clean[k] = to_jsonable_dict(v)
+        else:
+            clean[k] = v
+    if "_id" in clean:
+        clean["_id"] = str(clean["_id"])
+        clean["id"] = clean["_id"]
+    return clean
+
 async def create_exam(exam_in: ExamCreate, admin_id: str) -> dict:
     db = get_database()
     if db is None:
@@ -22,7 +42,7 @@ async def create_exam(exam_in: ExamCreate, admin_id: str) -> dict:
         doc["_id"] = str(result.inserted_id)
         doc["id"] = str(result.inserted_id)
         doc["question_count"] = len(doc.get("questions", []))
-        return doc
+        return to_jsonable_dict(doc)
     except Exception as err:
         logger.error(f"create_exam failure: {err}")
         raise HTTPException(status_code=500, detail=f"Failed to create exam: {str(err)}")
@@ -35,10 +55,9 @@ async def get_all_exams() -> List[dict]:
     try:
         cursor = db.exams.find({})
         async for exam in cursor:
-            exam["_id"] = str(exam["_id"])
-            exam["id"] = exam["_id"]
-            exam["question_count"] = len(exam.get("questions", []))
-            exams.append(exam)
+            clean_exam = to_jsonable_dict(exam)
+            clean_exam["question_count"] = len(clean_exam.get("questions", []))
+            exams.append(clean_exam)
     except Exception as err:
         logger.warning(f"get_all_exams failure: {err}")
         return []
@@ -57,9 +76,9 @@ async def get_exam_by_id(exam_id: str) -> dict:
         
         exam = await db.exams.find_one(query)
         if exam:
-            exam["_id"] = str(exam["_id"])
-            exam["question_count"] = len(exam.get("questions", []))
-            return exam
+            clean_exam = to_jsonable_dict(exam)
+            clean_exam["question_count"] = len(clean_exam.get("questions", []))
+            return clean_exam
         raise HTTPException(status_code=404, detail="Exam not found")
     except HTTPException:
         raise
@@ -172,7 +191,7 @@ async def submit_exam_and_evaluate(req: SubmitExamRequest, student_id: str, stud
         
         result = await db.reports.insert_one(submission_doc)
         submission_doc["_id"] = str(result.inserted_id)
-        return submission_doc
+        return to_jsonable_dict(submission_doc)
     except HTTPException:
         raise
     except Exception as err:
