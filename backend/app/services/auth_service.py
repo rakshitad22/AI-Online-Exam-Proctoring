@@ -7,6 +7,11 @@ from app.schemas.auth import LoginRequest, RegisterRequest, Token
 
 async def register_user(req: RegisterRequest) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database connection unavailable. Please check MONGODB_URL environment variable."
+        )
     existing_user = await db.users.find_one({"email": req.email.lower()})
     if existing_user:
         raise HTTPException(
@@ -41,6 +46,11 @@ async def register_user(req: RegisterRequest) -> dict:
 
 async def authenticate_user(req: LoginRequest) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database connection unavailable. Please check MONGODB_URL environment variable."
+        )
     user = await db.users.find_one({"email": req.email.lower()})
     if not user or not verify_password(req.password, user["hashed_password"]):
         raise HTTPException(

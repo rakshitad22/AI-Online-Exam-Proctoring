@@ -7,6 +7,8 @@ from app.schemas.exam import ExamCreate, SubmitExamRequest
 
 async def create_exam(exam_in: ExamCreate, admin_id: str) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     doc = exam_in.dict()
     doc["created_by"] = admin_id
     doc["is_active"] = True
@@ -20,6 +22,8 @@ async def create_exam(exam_in: ExamCreate, admin_id: str) -> dict:
 
 async def get_all_exams() -> List[dict]:
     db = get_database()
+    if db is None:
+        return []
     exams = []
     cursor = db.exams.find({})
     async for exam in cursor:
@@ -31,6 +35,8 @@ async def get_all_exams() -> List[dict]:
 
 async def get_exam_by_id(exam_id: str) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     try:
         obj_id = ObjectId(exam_id)
     except Exception:
@@ -53,6 +59,8 @@ async def get_exam_by_id(exam_id: str) -> dict:
 
 async def update_exam(exam_id: str, exam_data: dict) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     try:
         obj_id = ObjectId(exam_id)
         query = {"_id": obj_id}
@@ -70,6 +78,8 @@ async def update_exam(exam_id: str, exam_data: dict) -> dict:
 
 async def delete_exam(exam_id: str) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     try:
         obj_id = ObjectId(exam_id)
         query = {"_id": obj_id}
@@ -88,6 +98,8 @@ async def toggle_exam_active(exam_id: str) -> dict:
 
 async def submit_exam_and_evaluate(req: SubmitExamRequest, student_id: str, student_name: str) -> dict:
     db = get_database()
+    if db is None:
+        raise HTTPException(status_code=503, detail="Database service unavailable")
     exam = await get_exam_by_id(req.exam_id)
     
     questions = exam.get("questions", [])

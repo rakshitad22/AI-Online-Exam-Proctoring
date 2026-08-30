@@ -7,6 +7,8 @@ router = APIRouter()
 @router.get("/", response_model=List[dict])
 async def list_exam_reports(exam_id: Optional[str] = None, student_id: Optional[str] = None):
     db = get_database()
+    if db is None:
+        return []
     query = {}
     if exam_id:
         query["exam_id"] = exam_id
@@ -24,6 +26,11 @@ async def list_exam_reports(exam_id: Optional[str] = None, student_id: Optional[
 @router.get("/summary", response_model=dict)
 async def get_reports_summary():
     db = get_database()
+    if db is None:
+        return {
+            "total_students": 0, "total_exams": 0, "total_reports": 0, "total_violations": 0,
+            "flagged_reports": 0, "passed_reports": 0, "failed_reports": 0
+        }
     total_students = await db.users.count_documents({"role": "student"})
     total_exams = await db.exams.count_documents({})
     total_reports = await db.reports.count_documents({})
@@ -46,6 +53,8 @@ async def get_reports_summary():
 @router.get("/{exam_id}", response_model=List[dict])
 async def get_reports_by_exam_id(exam_id: str):
     db = get_database()
+    if db is None:
+        return []
     cursor = db.reports.find({"exam_id": exam_id}).sort("submitted_at", -1)
     reports = []
     async for r in cursor:
