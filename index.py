@@ -6,11 +6,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html
 
 CURRENT_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = CURRENT_DIR / "backend"
+
 if str(CURRENT_DIR) not in sys.path:
     sys.path.insert(0, str(CURRENT_DIR))
+if BACKEND_DIR.exists() and str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
-from app.core.config import settings
-from app.api.v1.api import api_router
+try:
+    from backend.app.core.config import settings
+    from backend.app.api.v1.api import api_router
+except ImportError:
+    from app.core.config import settings
+    from app.api.v1.api import api_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
