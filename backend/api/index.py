@@ -33,6 +33,7 @@ app.add_middleware(
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
 @app.get("/", tags=["Health Check"])
+@app.get("/api/index", tags=["Health Check"])
 def root():
     return {
         "project": settings.PROJECT_NAME,
