@@ -2,20 +2,42 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Camera, ShieldAlert, Mic, MicOff, Volume2 } from 'lucide-react';
 import { analyzeFrame, logViolation } from '../../services/proctorService';
 
+export const formatCleanLabel = (rawText) => {
+  if (!rawText) return 'Normal Activity';
+  const str = String(rawText).toUpperCase();
+  if (str.includes('EXTERNAL_DEVICE') || str.includes('MOBILE') || str.includes('PHONE') || str.includes('CV2')) {
+    return 'External Device Detected';
+  }
+  if (str.includes('MULTIPLE_PERSONS') || str.includes('MULTIPLE') || str.includes('PERSONS')) {
+    return 'Multiple Persons Detected';
+  }
+  if (str.includes('HEAD_MOVEMENT') || str.includes('GAZE') || str.includes('HEAD')) {
+    return 'Unusual Head Movement';
+  }
+  if (str.includes('TALKING') || str.includes('BACKGROUND_NOISE') || str.includes('SPEECH') || str.includes('AUDIO')) {
+    return 'Talking / Background Noise Detected';
+  }
+  if (str.includes('NORMAL') || str.includes('CLEAR')) {
+    return 'Normal Activity';
+  }
+  return 'Normal Activity';
+};
+
 const WebcamStream = ({ examId, studentId, onWarning }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [streamActive, setStreamActive] = useState(false);
-  const [aiStatus, setAiStatus] = useState('NORMAL'); // NORMAL, SUSPICIOUS, ERROR
-  const [currentClass, setCurrentClass] = useState('Normal exam behavior');
+  const [aiStatus, setAiStatus] = useState('NORMAL');
+  const [currentClass, setCurrentClass] = useState('Normal Activity');
   const [bboxes, setBboxes] = useState([]);
   
-  // Web Audio API State
-  const [audioLevel, setAudioLevel] = useState(0); // 0 - 100%
+  // Audio state
+  const [audioLevel, setAudioLevel] = useState(0);
   const [audioWarningActive, setAudioWarningActive] = useState(false);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const audioHistoryRef = useRef([]);
+  const lastWarningTimeRef = useRef(0);
 
   useEffect(() => {
     let intervalId;
@@ -35,7 +57,6 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
           setStreamActive(true);
         }
 
-        // Initialize Web Audio API Analyser
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (AudioContextClass) {
           const audioCtx = new AudioContextClass();
@@ -52,7 +73,6 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
             if (!analyserRef.current) return;
             analyserRef.current.getByteTimeDomainData(dataArray);
 
-            // Compute Root Mean Square (RMS) volume
             let sumSquares = 0;
             for (let i = 0; i < dataArray.length; i++) {
               const normalized = (dataArray[i] - 128) / 128.0;
@@ -62,20 +82,18 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
             const levelPct = Math.min(100, Math.round(rms * 250));
             setAudioLevel(levelPct);
 
-            // Track continuous sustained audio above RMS threshold (0.25 = ~60% level)
-            if (rms > 0.25) {
+            if (rms > 0.28) {
               audioHistoryRef.current.push(Date.now());
             } else {
-              audioHistoryRef.current = audioHistoryRef.current.filter(
-                (t) => Date.now() - t < 1500
-              );
+              audioHistoryRef.current = audioHistoryRef.current.filter((t) => Date.now() - t < 1500);
             }
 
-            // Trigger BACKGROUND_NOISE violation if sustained > 1.5s
-            if (audioHistoryRef.current.length > 12) {
+            const now = Date.now();
+            if (audioHistoryRef.current.length > 14 && now - lastWarningTimeRef.current > 4000) {
+              lastWarningTimeRef.current = now;
               setAudioWarningActive(true);
               setAiStatus('SUSPICIOUS');
-              setCurrentClass('Sustained Background Noise');
+              setCurrentClass('Talking / Background Noise Detected');
 
               logViolation({
                 exam_id: examId,
@@ -83,13 +101,15 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
                 violation_type: 'BACKGROUND_NOISE',
                 severity: 'MEDIUM',
                 confidence: 0.88,
-                details: 'Sustained abnormal audio / background noise detected',
+                details: 'Talking or abnormal audio activity detected',
               }).catch(() => {});
 
               if (onWarning) {
                 onWarning({
-                  detected_class: 'Sustained Background Noise',
-                  warning_message: 'WARNING: Sustained loud background noise or speaking detected!',
+                  activity: 'BACKGROUND_NOISE',
+                  detected_class: 'Talking / Background Noise Detected',
+                  warning_message: 'Talking / Background Noise Detected',
+                  warning_triggered: true,
                   confidence: 0.88,
                 });
               }
@@ -111,7 +131,7 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
 
     startMedia();
 
-    // Frame sampling timer (every 3 seconds)
+    // Frame sampling every 2.5 seconds
     intervalId = setInterval(async () => {
       if (videoRef.current && canvasRef.current && streamActive) {
         const canvas = canvasRef.current;
@@ -128,22 +148,29 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
 
         try {
           const res = await analyzeFrame(examId, studentId, frameData);
-          setCurrentClass(res.detected_class);
+          const cleanName = formatCleanLabel(res.detected_class || res.activity);
+          setCurrentClass(cleanName);
           setBboxes(res.detections || res.bounding_boxes || []);
 
-          if (res.is_violation || res.is_suspicious) {
+          const now = Date.now();
+          if ((res.is_violation || res.is_suspicious) && now - lastWarningTimeRef.current > 4000) {
+            lastWarningTimeRef.current = now;
             setAiStatus('SUSPICIOUS');
             if (onWarning) {
-              onWarning(res);
+              onWarning({
+                ...res,
+                detected_class: cleanName,
+                warning_triggered: true,
+              });
             }
-          } else if (!audioWarningActive) {
+          } else if (!audioWarningActive && now - lastWarningTimeRef.current > 4000) {
             setAiStatus('NORMAL');
           }
         } catch (err) {
           console.warn('Proctor frame API call fallback');
         }
       }
-    }, 3000);
+    }, 2500);
 
     return () => {
       if (intervalId) clearInterval(intervalId);
@@ -199,22 +226,25 @@ const WebcamStream = ({ examId, studentId, onWarning }) => {
         <canvas ref={canvasRef} className="hidden" />
 
         {/* AI Bounding Boxes Overlay */}
-        {bboxes.map((box, idx) => (
-          <div
-            key={idx}
-            className="absolute border-2 border-rose-500 bg-rose-500/10 pointer-events-none rounded transition-all"
-            style={{
-              left: `${box.x1 * 100}%`,
-              top: `${box.y1 * 100}%`,
-              width: `${(box.x2 - box.x1) * 100}%`,
-              height: `${(box.y2 - box.y1) * 100}%`,
-            }}
-          >
-            <span className="absolute -top-6 left-0 px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold shadow">
-              {box.label} ({(box.confidence * 100).toFixed(0)}%)
-            </span>
-          </div>
-        ))}
+        {bboxes.map((box, idx) => {
+          const cleanBoxLabel = formatCleanLabel(box.label);
+          return (
+            <div
+              key={idx}
+              className="absolute border-2 border-rose-500 bg-rose-500/10 pointer-events-none rounded transition-all"
+              style={{
+                left: `${box.x1 * 100}%`,
+                top: `${box.y1 * 100}%`,
+                width: `${(box.x2 - box.x1) * 100}%`,
+                height: `${(box.y2 - box.y1) * 100}%`,
+              }}
+            >
+              <span className="absolute -top-6 left-0 px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold shadow whitespace-nowrap">
+                {cleanBoxLabel} ({(box.confidence * 100).toFixed(0)}%)
+              </span>
+            </div>
+          );
+        })}
 
         {!streamActive && (
           <div className="absolute inset-0 bg-slate-900/90 flex flex-col items-center justify-center p-4 text-center">

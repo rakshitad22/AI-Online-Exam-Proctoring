@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldAlert, Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
+import { ShieldAlert, Mail, Lock, LogIn, Eye, EyeOff, UserCheck, ShieldCheck } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import { loginUser } from '../../services/authService';
 
@@ -14,13 +14,12 @@ const Login = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleLoginSubmit = async (eEmail, ePassword) => {
     setError('');
     setLoading(true);
 
     try {
-      const data = await loginUser(email, password);
+      const data = await loginUser(eEmail, ePassword);
       login(data);
       if (data.role === 'admin') {
         navigate('/admin/dashboard');
@@ -34,14 +33,25 @@ const Login = () => {
     }
   };
 
-  const fillDemoStudent = () => {
-    setEmail('student@example.com');
-    setPassword('student123');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleLoginSubmit(email, password);
   };
 
-  const fillDemoAdmin = () => {
-    setEmail('admin@example.com');
-    setPassword('admin123');
+  const handleDemoStudent = () => {
+    const demEmail = 'student@example.com';
+    const demPass = 'student123';
+    setEmail(demEmail);
+    setPassword(demPass);
+    handleLoginSubmit(demEmail, demPass);
+  };
+
+  const handleDemoAdmin = () => {
+    const demEmail = 'admin@example.com';
+    const demPass = 'admin123';
+    setEmail(demEmail);
+    setPassword(demPass);
+    handleLoginSubmit(demEmail, demPass);
   };
 
   return (
@@ -63,7 +73,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address / Username</label>
             <div className="relative">
               <Mail className="w-5 h-5 text-slate-500 absolute left-3.5 top-3" />
               <input
@@ -71,7 +81,7 @@ const Login = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@university.edu"
+                placeholder="student@example.com or RakshitaD76"
                 className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
               />
             </div>
@@ -109,20 +119,38 @@ const Login = () => {
           </button>
         </form>
 
-        <div className="pt-4 border-t border-slate-800 flex flex-col space-y-2">
-          <span className="text-[11px] font-bold text-slate-400 uppercase text-center">Quick Demo Shortcuts</span>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Restored Prominent Demo Accounts Section */}
+        <div className="pt-4 border-t border-slate-800 space-y-3">
+          <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase">
+            <span>One-Click Demo Portals</span>
+            <span className="text-indigo-400">Pre-configured Credentials</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2.5">
             <button
-              onClick={fillDemoStudent}
-              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
+              type="button"
+              onClick={handleDemoStudent}
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-xl bg-indigo-950/40 hover:bg-indigo-900/50 text-xs font-bold text-indigo-300 border border-indigo-500/30 flex items-center justify-between transition-all group"
             >
-              RakshitaD76 (Student)
+              <div className="flex items-center space-x-2">
+                <UserCheck className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+                <span>Login as Demo Student (RakshitaD76)</span>
+              </div>
+              <span className="font-mono text-[10px] text-indigo-400/80">student@example.com</span>
             </button>
+
             <button
-              onClick={fillDemoAdmin}
-              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
+              type="button"
+              onClick={handleDemoAdmin}
+              disabled={loading}
+              className="w-full py-2.5 px-4 rounded-xl bg-purple-950/40 hover:bg-purple-900/50 text-xs font-bold text-purple-300 border border-purple-500/30 flex items-center justify-between transition-all group"
             >
-              Demo Examiner
+              <div className="flex items-center space-x-2">
+                <ShieldCheck className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
+                <span>Login as Demo Examiner (Dr. Sarah)</span>
+              </div>
+              <span className="font-mono text-[10px] text-purple-400/80">admin@example.com</span>
             </button>
           </div>
         </div>

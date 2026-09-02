@@ -41,4 +41,6 @@ async def toggle_active_route(exam_id: str):
 
 @router.post("/submit", response_model=dict)
 async def submit_exam(req: SubmitExamRequest):
-    return await submit_exam_and_evaluate(req, student_id="std_demo_01", student_name="Student Candidate")
+    s_id = req.student_id or "CS-2024-076"
+    s_name = req.student_name or "RakshitaD76"
+    return await submit_exam_and_evaluate(req, student_id=s_id, student_name=s_name)

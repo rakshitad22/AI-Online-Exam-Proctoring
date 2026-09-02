@@ -198,7 +198,17 @@ async def submit_exam_and_evaluate(req: SubmitExamRequest, student_id: str, stud
         
     pct = (score / total_possible * 100) if total_possible > 0 else 0
     passing_marks = exam.get("passing_marks", total_possible * 0.4)
-    status_result = "PASSED" if score >= passing_marks else "FAILED"
+    
+    risk_score = min(100.0, float(req.total_warnings * 25))
+    if req.total_warnings >= 3:
+        status_result = "FLAGGED_FOR_REVIEW"
+        risk_category = "CRITICAL"
+    elif score < passing_marks:
+        status_result = "FAILED"
+        risk_category = "HIGH RISK" if risk_score >= 50 else ("MEDIUM" if risk_score >= 20 else "LOW")
+    else:
+        status_result = "PASSED"
+        risk_category = "HIGH RISK" if risk_score >= 50 else ("MEDIUM" if risk_score >= 20 else "LOW")
     
     submission_doc = {
         "_id": "sub_" + str(int(datetime.utcnow().timestamp())),
@@ -210,6 +220,8 @@ async def submit_exam_and_evaluate(req: SubmitExamRequest, student_id: str, stud
         "total_marks": total_possible,
         "percentage": round(pct, 2),
         "status": status_result,
+        "risk_score": risk_score,
+        "risk_category": risk_category,
         "answers": evaluated_answers,
         "total_warnings": req.total_warnings,
         "violation_summary": req.violation_summary or {},

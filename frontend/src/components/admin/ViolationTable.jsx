@@ -1,6 +1,7 @@
 import React from 'react';
 import StatusBadge from '../common/StatusBadge';
-import { AlertTriangle, Clock, User } from 'lucide-react';
+import { AlertTriangle, Clock } from 'lucide-react';
+import { formatCleanLabel } from '../student/WebcamStream';
 
 const ViolationTable = ({ violations = [] }) => {
   return (
@@ -34,30 +35,33 @@ const ViolationTable = ({ violations = [] }) => {
                 </td>
               </tr>
             ) : (
-              violations.map((v, idx) => (
-                <tr key={v.id || idx} className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs text-indigo-300">
-                    {v.student_id || 'std_demo_01'}
-                  </td>
-                  <td className="px-6 py-4 font-semibold text-slate-200">
-                    {v.violation_type || v.type}
-                  </td>
-                  <td className="px-6 py-4 text-slate-300 font-mono text-xs">
-                    {((v.confidence || 0.9) * 100).toFixed(1)}%
-                  </td>
-                  <td className="px-6 py-4 text-xs text-slate-400 flex items-center space-x-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-500" />
-                    <span>
-                      {v.timestamp
-                        ? new Date(v.timestamp).toLocaleTimeString()
-                        : new Date().toLocaleTimeString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <StatusBadge status={v.violation_type || v.type} />
-                  </td>
-                </tr>
-              ))
+              violations.map((v, idx) => {
+                const cleanType = formatCleanLabel(v.violation_type || v.type || v.detected_class);
+                return (
+                  <tr key={v.id || idx} className="hover:bg-slate-800/30 transition-colors">
+                    <td className="px-6 py-4 font-mono text-xs text-indigo-300">
+                      {v.student_id || 'CS-2024-076'}
+                    </td>
+                    <td className="px-6 py-4 font-semibold text-slate-200">
+                      {cleanType}
+                    </td>
+                    <td className="px-6 py-4 text-slate-300 font-mono text-xs">
+                      {((v.confidence || 0.9) * 100).toFixed(0)}%
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-400 flex items-center space-x-1.5">
+                      <Clock className="w-3.5 h-3.5 text-slate-500" />
+                      <span>
+                        {v.timestamp
+                          ? (String(v.timestamp).includes('T') ? new Date(v.timestamp).toLocaleTimeString() : v.timestamp)
+                          : new Date().toLocaleTimeString()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <StatusBadge status={cleanType} />
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ShieldCheck, Award, Clock, ArrowRight } from 'lucide-react';
+import { BookOpen, ShieldCheck, Award, Clock, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import Sidebar from '../../components/common/Sidebar';
 import ExamCard from '../../components/student/ExamCard';
 import { fetchAllExams } from '../../services/proctorService';
 import { ExamContext } from '../../context/ExamContext';
 import { AuthContext } from '../../context/AuthContext';
+import api from '../../services/api';
 
 const fallback5Exams = [
   {
@@ -58,13 +59,16 @@ const fallback5Exams = [
 
 const StudentDashboard = () => {
   const [exams, setExams] = useState([]);
+  const [submittedReports, setSubmittedReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const { setActiveExam } = useContext(ExamContext);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  const studentName = user?.full_name || 'RakshitaD76';
+
   useEffect(() => {
-    const loadExams = async () => {
+    const loadExamsAndResults = async () => {
       try {
         const data = await fetchAllExams();
         if (data && data.length > 0) {
@@ -74,12 +78,21 @@ const StudentDashboard = () => {
         }
       } catch (err) {
         setExams(fallback5Exams);
+      }
+
+      try {
+        const res = await api.get('/reports');
+        if (res.data && res.data.length > 0) {
+          setSubmittedReports(res.data);
+        }
+      } catch (e) {
+        console.warn('Failed to load submitted reports');
       } finally {
         setLoading(false);
       }
     };
 
-    loadExams();
+    loadExamsAndResults();
   }, []);
 
   const handleStartExam = (exam) => {
@@ -101,7 +114,7 @@ const StudentDashboard = () => {
                 <span>AI Automated Invigilation Enabled</span>
               </div>
               <h1 className="text-3xl font-extrabold text-white tracking-tight">
-                Welcome back, <span className="text-indigo-400">{user?.full_name || 'Student'}</span>
+                Welcome back, <span className="text-indigo-400">{studentName}</span>
               </h1>
               <p className="text-sm text-slate-400 leading-relaxed">
                 Select an active online exam below. Ensure your webcam and microphone are working properly before entering the proctored exam room.
@@ -133,13 +146,35 @@ const StudentDashboard = () => {
 
             <div className="glass-card rounded-2xl p-5 border border-slate-800 flex items-center justify-between">
               <div>
-                <span className="text-xs font-semibold text-slate-400">Max Warning Threshold</span>
-                <p className="text-2xl font-bold text-amber-400 mt-1">3 Warnings</p>
+                <span className="text-xs font-semibold text-slate-400">Completed Assessments</span>
+                <p className="text-2xl font-bold text-amber-400 mt-1">{submittedReports.length || 1}</p>
               </div>
               <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                <Clock className="w-5 h-5" />
+                <Award className="w-5 h-5" />
               </div>
             </div>
+          </div>
+
+          {/* Completed Exams Banner */}
+          <div className="glass-card rounded-2xl p-5 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/60">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-white text-sm">View Your Attended Exam Results</h3>
+                <p className="text-xs text-slate-400">
+                  Access score breakdowns, correct/wrong answers, and AI proctoring audit details.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/student/results')}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center space-x-2 transition-all shadow-md shadow-indigo-600/20 shrink-0"
+            >
+              <span>My Exam Results</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Active Exams Grid */}

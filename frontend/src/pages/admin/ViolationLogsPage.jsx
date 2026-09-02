@@ -3,6 +3,7 @@ import { AlertTriangle, Search, Filter, ShieldAlert, CheckCircle2, Clock } from 
 import Navbar from '../../components/common/Navbar';
 import Sidebar from '../../components/common/Sidebar';
 import { fetchViolations } from '../../services/proctorService';
+import { formatCleanLabel } from '../../components/student/WebcamStream';
 
 const defaultDemoViolations = [
   {
@@ -10,7 +11,7 @@ const defaultDemoViolations = [
     student_id: 'CS-2024-076',
     student_name: 'RakshitaD76',
     violation_type: 'EXTERNAL_DEVICE',
-    detected_class: 'External Device / Mobile Phone',
+    detected_class: 'External Device Detected',
     confidence: 0.94,
     timestamp: '10:24:15 AM',
     severity: 'HIGH RISK',
@@ -21,7 +22,7 @@ const defaultDemoViolations = [
     student_id: 'CS-2024-076',
     student_name: 'RakshitaD76',
     violation_type: 'BACKGROUND_NOISE',
-    detected_class: 'Background Noise / Suspicious Audio',
+    detected_class: 'Talking / Background Noise Detected',
     confidence: 0.87,
     timestamp: '10:24:50 AM',
     severity: 'MEDIUM RISK',
@@ -43,7 +44,7 @@ const defaultDemoViolations = [
     student_id: 'CS-2024-042',
     student_name: 'Sarah Miller',
     violation_type: 'HEAD_MOVEMENT',
-    detected_class: 'Abnormal Head Movement',
+    detected_class: 'Unusual Head Movement',
     confidence: 0.82,
     timestamp: '09:40:12 AM',
     severity: 'LOW RISK',
@@ -77,16 +78,16 @@ const ViolationLogsPage = () => {
   }, []);
 
   const filteredViolations = violations.filter((v) => {
+    const cleanType = formatCleanLabel(v.violation_type || v.detected_class);
     const matchesSearch =
       (v.student_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
       (v.student_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (v.violation_type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (v.detected_class || '').toLowerCase().includes(searchTerm.toLowerCase());
+      cleanType.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesClass =
       selectedClass === 'ALL' ||
       (v.violation_type || '').includes(selectedClass) ||
-      (v.detected_class || '').includes(selectedClass);
+      cleanType.includes(selectedClass);
 
     return matchesSearch && matchesClass;
   });
@@ -162,8 +163,8 @@ const ViolationLogsPage = () => {
                     </tr>
                   ) : (
                     filteredViolations.map((v, idx) => {
-                      const type = v.violation_type || v.detected_class || 'Abnormal Activity';
-                      const isHigh = type.includes('EXTERNAL_DEVICE') || type.includes('MULTIPLE_PERSONS');
+                      const cleanClass = formatCleanLabel(v.detected_class || v.violation_type);
+                      const isHigh = cleanClass.includes('External') || cleanClass.includes('Multiple');
                       const confPct = Math.round((v.confidence || 0.9) * 100);
 
                       return (
@@ -184,7 +185,7 @@ const ViolationLogsPage = () => {
                                   : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                               }`}
                             >
-                              {v.detected_class || v.violation_type || 'Abnormal Activity'}
+                              {cleanClass}
                             </span>
                           </td>
                           <td className="px-6 py-4 font-mono font-bold text-slate-200">

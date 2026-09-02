@@ -1,14 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, ShieldAlert, CheckCircle, Send, AlertTriangle, X } from 'lucide-react';
+import { Clock, ShieldAlert, CheckCircle, Send, AlertTriangle, X, Radio } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
-import WebcamStream from '../../components/student/WebcamStream';
+import WebcamStream, { formatCleanLabel } from '../../components/student/WebcamStream';
 import WarningBanner from '../../components/student/WarningBanner';
 import QuestionView from '../../components/student/QuestionView';
 import Modal from '../../components/common/Modal';
 import { ExamContext } from '../../context/ExamContext';
 import { AuthContext } from '../../context/AuthContext';
 import { submitExamAnswers } from '../../services/proctorService';
+
+const getViolationIcon = (typeStr) => {
+  const str = String(typeStr || '').toUpperCase();
+  if (str.includes('EXTERNAL') || str.includes('MOBILE') || str.includes('PHONE')) return '📱';
+  if (str.includes('MULTIPLE') || str.includes('PERSON')) return '👥';
+  if (str.includes('HEAD') || str.includes('GAZE')) return '👀';
+  if (str.includes('TALKING') || str.includes('BACKGROUND') || str.includes('AUDIO')) return '🎤';
+  return '🟢';
+};
 
 const ExamEnvironment = () => {
   const { activeExam, warningsCount, addWarning, violationsLog } = useContext(ExamContext);
@@ -54,7 +63,8 @@ const ExamEnvironment = () => {
   };
 
   const handleProctorWarning = (detectionResult) => {
-    setLatestActivity(detectionResult.activity || 'NORMAL');
+    const act = detectionResult.activity || detectionResult.detected_class || 'NORMAL';
+    setLatestActivity(act);
     const msg = detectionResult.message || detectionResult.warning_message;
     if (msg) {
       setLatestWarningMsg(msg);
@@ -87,12 +97,15 @@ const ExamEnvironment = () => {
 
     const marksPerQ = activeExam.total_marks ? activeExam.total_marks / totalQCount : 5;
     const computedScore = Math.round(correctCount * marksPerQ);
+    const computedPercentage = Math.round((computedScore / (activeExam.total_marks || 100)) * 100);
 
     try {
       const payload = {
         exam_id: activeExam.id,
         answers: answers,
         total_warnings: warningsCount,
+        student_id: user?.student_id || 'CS-2024-076',
+        student_name: candidateName,
         violation_summary: {
           total_violations: violationsLog.length,
           log: violationsLog,
@@ -107,9 +120,11 @@ const ExamEnvironment = () => {
         student_id: user?.student_id || 'CS-2024-076',
         score: result.score !== undefined ? result.score : computedScore,
         total_marks: activeExam.total_marks || 100,
+        percentage: result.percentage !== undefined ? result.percentage : computedPercentage,
         status: warningsCount >= 3 ? 'FLAGGED_FOR_REVIEW' : (result.status || 'PASSED'),
         total_warnings: warningsCount,
         risk_score: result.risk_score !== undefined ? result.risk_score : Math.min(100, warningsCount * 25),
+        risk_category: result.risk_category || (warningsCount >= 3 ? 'CRITICAL' : warningsCount >= 2 ? 'HIGH RISK' : 'LOW'),
         submitted_at: result.submitted_at || new Date().toISOString(),
         answers_breakdown: {
           answered: Object.keys(answers).length,
@@ -130,9 +145,11 @@ const ExamEnvironment = () => {
         student_id: user?.student_id || 'CS-2024-076',
         score: computedScore,
         total_marks: activeExam.total_marks || 100,
+        percentage: computedPercentage,
         status: warningsCount >= 3 ? 'FLAGGED_FOR_REVIEW' : 'PASSED',
         total_warnings: warningsCount,
         risk_score: Math.min(100, warningsCount * 25),
+        risk_category: warningsCount >= 3 ? 'CRITICAL' : warningsCount >= 2 ? 'HIGH RISK' : 'LOW',
         submitted_at: new Date().toISOString(),
         answers_breakdown: {
           answered: Object.keys(answers).length,
@@ -267,33 +284,43 @@ const ExamEnvironment = () => {
             onWarning={handleProctorWarning}
           />
 
-          {/* Violation Stream Logger Panel */}
+          {/* AI Violation Stream Logger Panel */}
           <div className="glass-card rounded-2xl p-4 border border-slate-800 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <span className="text-xs font-bold text-slate-300">Live AI Violation Stream</span>
+              <div className="flex items-center space-x-2">
+                <Radio className="w-4 h-4 text-rose-400 animate-pulse" />
+                <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">AI Violation Stream</span>
+              </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900 text-amber-400 border border-slate-800">
                 {violationsLog.length} Event(s)
               </span>
             </div>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
               {violationsLog.length === 0 ? (
-                <p className="text-xs text-slate-500 text-center py-4">
-                  No abnormal activities detected. Maintain focus.
-                </p>
+                <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/20 text-center flex items-center justify-center space-x-2">
+                  <span className="text-sm">🟢</span>
+                  <span className="text-xs text-emerald-400 font-semibold">Normal Activity Detected</span>
+                </div>
               ) : (
-                violationsLog.map((log) => (
-                  <div
-                    key={log.id}
-                    className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800/80 flex items-start justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-semibold text-rose-400 block">{log.type}</span>
-                      <span className="text-[10px] text-slate-400">{log.message}</span>
+                violationsLog.map((log) => {
+                  const icon = getViolationIcon(log.type);
+                  return (
+                    <div
+                      key={log.id}
+                      className="p-2.5 rounded-xl bg-slate-900/90 border border-slate-800/80 flex items-start space-x-2.5 text-xs shadow-sm"
+                    >
+                      <span className="text-base select-none mt-0.5">{icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-rose-300 truncate">{formatCleanLabel(log.type)}</span>
+                          <span className="text-[10px] text-slate-500 font-mono shrink-0 ml-1">{log.timestamp}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 block mt-0.5 leading-snug">{log.message}</span>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-slate-500 font-mono">{log.timestamp}</span>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>

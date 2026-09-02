@@ -39,3 +39,5 @@ class SubmitExamRequest(BaseModel):
     answers: dict # question_id -> selected_option_index
     total_warnings: int = 0
     violation_summary: Optional[dict] = None
+    student_id: Optional[str] = "CS-2024-076"
+    student_name: Optional[str] = "RakshitaD76"
