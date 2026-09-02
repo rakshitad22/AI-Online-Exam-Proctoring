@@ -4,9 +4,9 @@ import { AlertOctagon, CheckCircle, ShieldAlert } from 'lucide-react';
 const StudentRiskList = ({ students = [] }) => {
   // Default mock list if no DB data yet
   const defaultList = [
-    { id: '1', name: 'Alex Johnson', student_id: 'CS-2024-001', risk_score: 0.85, status: 'FLAGGED' },
-    { id: '2', name: 'Sarah Miller', student_id: 'CS-2024-042', risk_score: 0.15, status: 'CLEAR' },
-    { id: '3', name: 'David Chen', student_id: 'CS-2024-089', risk_score: 0.65, status: 'SUSPICIOUS' },
+    { id: '1', name: 'RakshitaD76', student_id: 'CS-2024-076', risk_score: 0.65, status: 'FLAGGED' },
+    { id: '2', name: 'Alex Johnson', student_id: 'CS-2024-001', risk_score: 0.25, status: 'CLEAR' },
+    { id: '3', name: 'Sarah Miller', student_id: 'CS-2024-042', risk_score: 0.05, status: 'CLEAR' },
   ];
 
   const list = students.length > 0 ? students : defaultList;
@@ -23,28 +23,31 @@ const StudentRiskList = ({ students = [] }) => {
 
       <div className="space-y-3">
         {list.map((std) => {
-          const isHighRisk = std.risk_score > 0.6;
+          const rawRisk = std.risk_score || 0;
+          const riskPct = rawRisk > 1 ? Math.min(100, Math.round(rawRisk)) : Math.round(rawRisk * 100);
+          const isHighRisk = riskPct >= 50;
+
           return (
             <div
-              key={std.id}
+              key={std.id || std._id || std.student_id}
               className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between hover:border-slate-700 transition-all"
             >
               <div>
-                <h4 className="font-semibold text-sm text-slate-200">{std.name || std.student_name}</h4>
-                <p className="text-xs text-slate-400 font-mono mt-0.5">{std.student_id}</p>
+                <h4 className="font-semibold text-sm text-slate-200">{std.name || std.student_name || 'RakshitaD76'}</h4>
+                <p className="text-xs text-slate-400 font-mono mt-0.5">{std.student_id || 'CS-2024-076'}</p>
               </div>
 
               <div className="flex items-center space-x-4">
                 <div className="text-right">
                   <span className="text-xs font-bold block text-slate-300">
-                    Risk Score: {(std.risk_score * 100).toFixed(0)}%
+                    Risk Score: {riskPct}%
                   </span>
                   <div className="w-24 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
                         isHighRisk ? 'bg-rose-500' : 'bg-emerald-500'
                       }`}
-                      style={{ width: `${std.risk_score * 100}%` }}
+                      style={{ width: `${riskPct}%` }}
                     />
                   </div>
                 </div>

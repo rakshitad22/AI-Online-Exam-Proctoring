@@ -28,7 +28,7 @@ const Sidebar = () => {
     { name: 'Admin Overview', path: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Manage Exams', path: '/admin/exams', icon: BookOpen },
     { name: 'Active Monitoring', path: '/admin/monitoring', icon: ShieldAlert },
-    { name: 'Violation Logs', path: '/admin/monitoring#violations', icon: AlertTriangle },
+    { name: 'Violation Logs', path: '/admin/violations', icon: AlertTriangle },
     { name: 'Proctoring Reports', path: '/admin/reports', icon: FileText },
   ];
 

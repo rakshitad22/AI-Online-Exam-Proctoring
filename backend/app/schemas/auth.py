@@ -6,6 +6,7 @@ class Token(BaseModel):
     token_type: str
     role: str
     user_id: str
+    student_id: Optional[str] = "CS-2024-076"
     full_name: str
     email: str
 

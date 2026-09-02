@@ -1,12 +1,13 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldAlert, Mail, Lock, LogIn } from 'lucide-react';
+import { ShieldAlert, Mail, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import { loginUser } from '../../services/authService';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -81,13 +82,20 @@ const Login = () => {
             <div className="relative">
               <Lock className="w-5 h-5 text-slate-500 absolute left-3.5 top-3" />
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-11 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                className="w-full bg-slate-900/80 border border-slate-800 rounded-xl pl-11 pr-11 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-3 text-slate-500 hover:text-slate-300 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
@@ -106,13 +114,13 @@ const Login = () => {
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={fillDemoStudent}
-              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700"
+              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
             >
-              Demo Student
+              RakshitaD76 (Student)
             </button>
             <button
               onClick={fillDemoAdmin}
-              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700"
+              className="py-1.5 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700 transition-colors"
             >
               Demo Examiner
             </button>

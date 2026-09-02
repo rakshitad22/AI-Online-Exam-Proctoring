@@ -11,16 +11,18 @@ const ActiveMonitoring = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const activeCandidates = [
-    { id: '1', name: 'Alex Johnson', student_id: 'CS-2024-001', exam: 'Computer Vision Final', warnings: 2, status: 'SUSPICIOUS' },
-    { id: '2', name: 'Sarah Miller', student_id: 'CS-2024-042', exam: 'Computer Vision Final', warnings: 0, status: 'NORMAL' },
-    { id: '3', name: 'David Chen', student_id: 'CS-2024-089', exam: 'Computer Vision Final', warnings: 3, status: 'FLAGGED' },
+    { id: '1', name: 'RakshitaD76', student_id: 'CS-2024-076', exam: 'Test 2: Machine Learning Fundamentals', warnings: 3, status: 'FLAGGED' },
+    { id: '2', name: 'Alex Johnson', student_id: 'CS-2024-001', exam: 'Test 1: Computer Vision & OpenCV', warnings: 1, status: 'SUSPICIOUS' },
+    { id: '3', name: 'Sarah Miller', student_id: 'CS-2024-042', exam: 'Test 3: Deep Learning & CNN', warnings: 0, status: 'NORMAL' },
   ];
 
   const loadData = async () => {
     setRefreshing(true);
     try {
       const data = await fetchViolations();
-      setViolations(data);
+      if (data && data.length > 0) {
+        setViolations(data);
+      }
     } catch (err) {
       console.warn('Backend fallback for live violation streaming');
     } finally {
@@ -62,8 +64,8 @@ const ActiveMonitoring = () => {
 
           {/* Active Candidates Feed Grid */}
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider text-slate-400">
-              Active Candidate Sessions (3 Online)
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Active Candidate Sessions ({activeCandidates.length} Online)
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

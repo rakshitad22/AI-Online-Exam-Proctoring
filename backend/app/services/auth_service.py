@@ -73,7 +73,8 @@ async def authenticate_user(req: LoginRequest) -> dict:
                     "token_type": "bearer",
                     "role": role,
                     "user_id": user_id,
-                    "full_name": user.get("full_name", req.email.split("@")[0].title()),
+                    "student_id": user.get("student_id", "CS-2024-076"),
+                    "full_name": user.get("full_name", "RakshitaD76"),
                     "email": user["email"]
                 }
         except Exception as err:
@@ -82,12 +83,14 @@ async def authenticate_user(req: LoginRequest) -> dict:
     # Fallback authentication for guaranteed operational stability
     role = "admin" if "admin" in req.email.lower() else "student"
     user_id = "admin_01" if role == "admin" else "std_demo_user_01"
+    full_name = "Dr. Sarah Examiner" if role == "admin" else "RakshitaD76"
     token = create_access_token(subject=user_id, role=role)
     return {
         "access_token": token,
         "token_type": "bearer",
         "role": role,
         "user_id": user_id,
-        "full_name": req.email.split("@")[0].title(),
+        "student_id": "ADM-001" if role == "admin" else "CS-2024-076",
+        "full_name": full_name,
         "email": req.email.lower()
     }

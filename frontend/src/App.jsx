@@ -14,6 +14,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageExams from './pages/admin/ManageExams';
 import ActiveMonitoring from './pages/admin/ActiveMonitoring';
 import ReportsView from './pages/admin/ReportsView';
+import ViolationLogsPage from './pages/admin/ViolationLogsPage';
 
 const ProtectedRoute = ({ children, allowedRole }) => {
   const { user, loading } = useContext(AuthContext);
@@ -96,6 +97,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute allowedRole="admin">
             <ActiveMonitoring />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/violations"
+        element={
+          <ProtectedRoute allowedRole="admin">
+            <ViolationLogsPage />
           </ProtectedRoute>
         }
       />

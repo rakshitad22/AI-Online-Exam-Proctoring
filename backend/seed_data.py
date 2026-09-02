@@ -817,18 +817,35 @@ async def seed_database():
     if not existing_student:
         student_doc = {
             "email": student_email,
-            "full_name": "Alex Johnson",
+            "full_name": "RakshitaD76",
             "hashed_password": get_password_hash("student123"),
             "role": "student",
-            "student_id": "CS-2024-001",
+            "student_id": "CS-2024-076",
             "department": "Software Engineering",
             "is_active": True
         }
         await db.users.insert_one(student_doc)
         logger.info(f"Created demo student account: {student_email} / student123")
     else:
-        # Ensure password hash is updated to student123
-        await db.users.update_one({"email": student_email}, {"$set": {"hashed_password": get_password_hash("student123"), "is_active": True}})
+        # Ensure password hash is updated to student123 and full_name is RakshitaD76
+        await db.users.update_one({"email": student_email}, {"$set": {"hashed_password": get_password_hash("student123"), "full_name": "RakshitaD76", "student_id": "CS-2024-076", "is_active": True}})
+
+    # Also seed secondary rakshitad76@example.com account
+    r_email = "rakshitad76@example.com"
+    existing_r = await db.users.find_one({"email": r_email})
+    if not existing_r:
+        r_doc = {
+            "email": r_email,
+            "full_name": "RakshitaD76",
+            "hashed_password": get_password_hash("student123"),
+            "role": "student",
+            "student_id": "CS-2024-076",
+            "department": "Computer Science & AI",
+            "is_active": True
+        }
+        await db.users.insert_one(r_doc)
+    else:
+        await db.users.update_one({"email": r_email}, {"$set": {"hashed_password": get_password_hash("student123"), "full_name": "RakshitaD76", "student_id": "CS-2024-076", "is_active": True}})
 
     # Seed 5 Distinct Examinations
     # Clean up legacy old sample exams if present
