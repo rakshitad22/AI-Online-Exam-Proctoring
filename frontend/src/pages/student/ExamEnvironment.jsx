@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, ShieldAlert, CheckCircle, Send, AlertTriangle, X, Radio } from 'lucide-react';
+import { Clock, ShieldAlert, CheckCircle, Send, AlertTriangle, X, Radio, AlertOctagon } from 'lucide-react';
 import Navbar from '../../components/common/Navbar';
 import WebcamStream, { formatCleanLabel } from '../../components/student/WebcamStream';
 import WarningBanner from '../../components/student/WarningBanner';
@@ -26,13 +26,17 @@ const ExamEnvironment = () => {
 
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(45 * 60); // 45 mins default
+  const [timeLeft, setTimeLeft] = useState(45 * 60);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showTerminationModal, setShowTerminationModal] = useState(false);
   const [latestWarningMsg, setLatestWarningMsg] = useState(null);
   const [latestActivity, setLatestActivity] = useState('NORMAL');
-
+  
+  const autoSubmittedRef = useRef(false);
   const candidateName = user?.full_name || 'RakshitaD76';
+
+  const MAX_WARNINGS = 5;
 
   useEffect(() => {
     if (!activeExam) {
@@ -48,7 +52,7 @@ const ExamEnvironment = () => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          executeSubmission();
+          executeSubmission(false, 'Exam time expired');
           return 0;
         }
         return prev - 1;
@@ -58,11 +62,25 @@ const ExamEnvironment = () => {
     return () => clearInterval(timer);
   }, [activeExam]);
 
+  // Auto-Terminate on 5 Warnings Limit
+  useEffect(() => {
+    if (warningsCount >= MAX_WARNINGS && !autoSubmittedRef.current) {
+      autoSubmittedRef.current = true;
+      setShowTerminationModal(true);
+      setTimeout(() => {
+        executeSubmission(true, 'Maximum AI proctoring warnings reached (5/5)');
+      }, 2500);
+    }
+  }, [warningsCount]);
+
   const handleSelectOption = (qId, optionIdx) => {
+    if (autoSubmittedRef.current || warningsCount >= MAX_WARNINGS) return;
     setAnswers((prev) => ({ ...prev, [qId]: optionIdx }));
   };
 
   const handleProctorWarning = (detectionResult) => {
+    if (autoSubmittedRef.current || warningsCount >= MAX_WARNINGS) return;
+
     const act = detectionResult.activity || detectionResult.detected_class || 'NORMAL';
     setLatestActivity(act);
     const msg = detectionResult.message || detectionResult.warning_message;
@@ -75,10 +93,11 @@ const ExamEnvironment = () => {
   };
 
   const handleOpenConfirm = () => {
+    if (autoSubmittedRef.current || warningsCount >= MAX_WARNINGS) return;
     setShowConfirmModal(true);
   };
 
-  const executeSubmission = async () => {
+  const executeSubmission = async (isAutoTerminated = false, terminationReason = '') => {
     if (submitting) return;
     setSubmitting(true);
     setShowConfirmModal(false);
@@ -86,7 +105,6 @@ const ExamEnvironment = () => {
     const questions = activeExam.questions || [];
     const totalQCount = questions.length || 20;
     
-    // Calculate score locally for consistency
     let correctCount = 0;
     questions.forEach((q) => {
       const selected = answers[q.id];
@@ -98,17 +116,21 @@ const ExamEnvironment = () => {
     const marksPerQ = activeExam.total_marks ? activeExam.total_marks / totalQCount : 5;
     const computedScore = Math.round(correctCount * marksPerQ);
     const computedPercentage = Math.round((computedScore / (activeExam.total_marks || 100)) * 100);
+    const effectiveWarnings = isAutoTerminated ? MAX_WARNINGS : Math.min(MAX_WARNINGS, warningsCount);
+    const calculatedRisk = Math.min(100, effectiveWarnings * 20);
 
     try {
       const payload = {
         exam_id: activeExam.id,
         answers: answers,
-        total_warnings: warningsCount,
+        total_warnings: effectiveWarnings,
         student_id: user?.student_id || 'CS-2024-076',
         student_name: candidateName,
         violation_summary: {
           total_violations: violationsLog.length,
           log: violationsLog,
+          is_terminated: isAutoTerminated,
+          termination_reason: terminationReason,
         },
       };
 
@@ -121,10 +143,12 @@ const ExamEnvironment = () => {
         score: result.score !== undefined ? result.score : computedScore,
         total_marks: activeExam.total_marks || 100,
         percentage: result.percentage !== undefined ? result.percentage : computedPercentage,
-        status: warningsCount >= 3 ? 'FLAGGED_FOR_REVIEW' : (result.status || 'PASSED'),
-        total_warnings: warningsCount,
-        risk_score: result.risk_score !== undefined ? result.risk_score : Math.min(100, warningsCount * 25),
-        risk_category: result.risk_category || (warningsCount >= 3 ? 'CRITICAL' : warningsCount >= 2 ? 'HIGH RISK' : 'LOW'),
+        status: effectiveWarnings >= MAX_WARNINGS ? 'FLAGGED_FOR_REVIEW' : (result.status || 'PASSED'),
+        total_warnings: effectiveWarnings,
+        max_warnings: MAX_WARNINGS,
+        risk_score: calculatedRisk,
+        risk_category: effectiveWarnings >= MAX_WARNINGS ? 'CRITICAL' : effectiveWarnings >= 3 ? 'HIGH RISK' : 'LOW',
+        termination_reason: isAutoTerminated ? terminationReason : null,
         submitted_at: result.submitted_at || new Date().toISOString(),
         answers_breakdown: {
           answered: Object.keys(answers).length,
@@ -146,10 +170,12 @@ const ExamEnvironment = () => {
         score: computedScore,
         total_marks: activeExam.total_marks || 100,
         percentage: computedPercentage,
-        status: warningsCount >= 3 ? 'FLAGGED_FOR_REVIEW' : 'PASSED',
-        total_warnings: warningsCount,
-        risk_score: Math.min(100, warningsCount * 25),
-        risk_category: warningsCount >= 3 ? 'CRITICAL' : warningsCount >= 2 ? 'HIGH RISK' : 'LOW',
+        status: effectiveWarnings >= MAX_WARNINGS ? 'FLAGGED_FOR_REVIEW' : 'PASSED',
+        total_warnings: effectiveWarnings,
+        max_warnings: MAX_WARNINGS,
+        risk_score: calculatedRisk,
+        risk_category: effectiveWarnings >= MAX_WARNINGS ? 'CRITICAL' : effectiveWarnings >= 3 ? 'HIGH RISK' : 'LOW',
+        termination_reason: isAutoTerminated ? terminationReason : null,
         submitted_at: new Date().toISOString(),
         answers_breakdown: {
           answered: Object.keys(answers).length,
@@ -208,8 +234,8 @@ const ExamEnvironment = () => {
 
           <button
             onClick={handleOpenConfirm}
-            disabled={submitting}
-            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center space-x-2 transition-all shadow-md shadow-emerald-600/20"
+            disabled={submitting || warningsCount >= MAX_WARNINGS}
+            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-semibold text-xs flex items-center space-x-2 transition-all shadow-md shadow-emerald-600/20"
           >
             <Send className="w-4 h-4" />
             <span>{submitting ? 'Submitting...' : 'Submit Exam'}</span>
@@ -224,7 +250,7 @@ const ExamEnvironment = () => {
           {/* Warning Counter Banner */}
           <WarningBanner
             warningsCount={warningsCount}
-            maxWarnings={3}
+            maxWarnings={MAX_WARNINGS}
             latestMessage={latestWarningMsg}
             latestActivity={latestActivity}
           />
@@ -242,7 +268,7 @@ const ExamEnvironment = () => {
           <div className="flex items-center justify-between pt-2">
             <button
               onClick={() => setCurrentQIndex((prev) => Math.max(0, prev - 1))}
-              disabled={currentQIndex === 0}
+              disabled={currentQIndex === 0 || warningsCount >= MAX_WARNINGS}
               className="px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 font-semibold text-xs hover:bg-slate-800 disabled:opacity-40 transition-colors"
             >
               Previous Question
@@ -253,6 +279,7 @@ const ExamEnvironment = () => {
                 <button
                   key={q.id || idx}
                   onClick={() => setCurrentQIndex(idx)}
+                  disabled={warningsCount >= MAX_WARNINGS}
                   className={`w-7 h-7 rounded-lg text-xs font-bold transition-all border ${
                     currentQIndex === idx
                       ? 'bg-indigo-600 border-indigo-500 text-white'
@@ -268,7 +295,7 @@ const ExamEnvironment = () => {
 
             <button
               onClick={() => setCurrentQIndex((prev) => Math.min(totalQuestions - 1, prev + 1))}
-              disabled={currentQIndex === totalQuestions - 1}
+              disabled={currentQIndex === totalQuestions - 1 || warningsCount >= MAX_WARNINGS}
               className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs disabled:opacity-40 transition-all shadow-md shadow-indigo-600/20"
             >
               Next Question
@@ -327,8 +354,45 @@ const ExamEnvironment = () => {
         </div>
       </div>
 
+      {/* Auto Termination Modal */}
+      {showTerminationModal && (
+        <Modal isOpen={true} onClose={() => {}} title="EXAM TERMINATED">
+          <div className="space-y-5 text-center py-2">
+            <div className="mx-auto w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 animate-bounce">
+              <AlertOctagon className="w-8 h-8" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-extrabold text-white">Maximum AI Proctoring Warnings Reached</h3>
+              <p className="text-xs text-slate-300 max-w-md mx-auto">
+                You have accumulated <strong className="text-rose-400">5 out of 5 warnings</strong> for abnormal examination activity. Your exam has been automatically terminated and submitted for examiner review.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-around text-xs">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Warnings</span>
+                <span className="text-lg font-mono font-extrabold text-rose-400">5 / 5</span>
+              </div>
+              <div className="border-x border-slate-800 px-4">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Status</span>
+                <span className="text-xs font-bold text-rose-400 uppercase">Flagged for Review</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Risk Score</span>
+                <span className="text-lg font-mono font-extrabold text-indigo-400">100%</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-center space-x-2 text-xs text-slate-400 font-mono">
+              <span className="animate-spin text-indigo-400">⚡</span>
+              <span>Finalizing examination report... redirecting...</span>
+            </div>
+          </div>
+        </Modal>
+      )}
+
       {/* Submit Confirmation Modal */}
-      {showConfirmModal && (
+      {showConfirmModal && !showTerminationModal && (
         <Modal isOpen={true} onClose={() => setShowConfirmModal(false)} title="Submit Examination?">
           <div className="space-y-5">
             <p className="text-xs text-slate-300">
@@ -346,8 +410,8 @@ const ExamEnvironment = () => {
               </div>
               <div className="space-y-0.5">
                 <span className="text-[10px] uppercase font-bold text-slate-400 block">AI Warnings</span>
-                <span className={`text-lg font-extrabold ${warningsCount >= 3 ? 'text-rose-400' : 'text-indigo-400'}`}>
-                  {warningsCount} / 3
+                <span className={`text-lg font-extrabold ${warningsCount >= MAX_WARNINGS ? 'text-rose-400' : 'text-indigo-400'}`}>
+                  {warningsCount} / {MAX_WARNINGS}
                 </span>
               </div>
             </div>
@@ -360,7 +424,7 @@ const ExamEnvironment = () => {
                 Cancel
               </button>
               <button
-                onClick={executeSubmission}
+                onClick={() => executeSubmission(false, '')}
                 disabled={submitting}
                 className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5"
               >

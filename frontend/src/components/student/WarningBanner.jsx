@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, AlertOctagon, CheckCircle2 } from 'lucide-react';
 
-const WarningBanner = ({ warningsCount = 0, maxWarnings = 3, latestMessage, latestActivity = 'NORMAL' }) => {
+const WarningBanner = ({ warningsCount = 0, maxWarnings = 5, latestMessage, latestActivity = 'NORMAL' }) => {
   let bannerStyle = 'bg-emerald-950/40 border-emerald-500/50 text-emerald-200';
   let icon = <CheckCircle2 className="w-6 h-6 text-emerald-400" />;
   let title = 'AI MONITORING LIVE';
@@ -20,12 +20,12 @@ const WarningBanner = ({ warningsCount = 0, maxWarnings = 3, latestMessage, late
   }
 
   const getDisplayMessage = () => {
-    if (latestActivity === 'EXTERNAL_DEVICE') return '⚠ Mobile Phone / External Device Detected!';
-    if (latestActivity === 'MULTIPLE_PERSONS') return '⚠ Multiple Persons Detected!';
-    if (latestActivity === 'HEAD_MOVEMENT') return '⚠ Excessive Head Movement Detected';
-    if (latestActivity === 'TALKING') return '⚠ Talking / Mouth Movement Detected';
-    if (latestActivity === 'BACKGROUND_NOISE') return '⚠ Background Noise / Suspicious Audio Detected';
-    if (latestActivity === 'NORMAL') return '✓ AI Monitoring: Normal';
+    if (latestActivity === 'EXTERNAL_DEVICE') return '📱 Mobile Phone / External Device Detected!';
+    if (latestActivity === 'MULTIPLE_PERSONS') return '👥 Multiple Persons Detected!';
+    if (latestActivity === 'HEAD_MOVEMENT') return '👀 Unusual Head Movement Detected';
+    if (latestActivity === 'TALKING') return '🎤 Talking / Speech Detected';
+    if (latestActivity === 'BACKGROUND_NOISE') return '🎤 Background Noise / Audio Detected';
+    if (latestActivity === 'NORMAL') return '🟢 AI Monitoring: Normal Activity';
     return latestMessage || 'AI proctoring system active.';
   };
 
@@ -40,7 +40,7 @@ const WarningBanner = ({ warningsCount = 0, maxWarnings = 3, latestMessage, late
             <span className="font-extrabold text-sm uppercase tracking-wide">
               {title}
             </span>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-slate-900/80 border border-current">
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-extrabold bg-slate-900/80 border border-current">
               Warning {warningsCount} / {maxWarnings}
             </span>
           </div>

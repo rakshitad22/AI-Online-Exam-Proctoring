@@ -105,7 +105,7 @@ const ExamResult = () => {
 
   const riskCat = getRiskCategory(riskPercent);
   const isPassed = report.status === 'PASSED' || report.status === 'PASS';
-  const isFlagged = report.status === 'FLAGGED_FOR_REVIEW' || (report.total_warnings && report.total_warnings >= 3);
+  const isFlagged = report.status === 'FLAGGED_FOR_REVIEW' || (report.total_warnings && report.total_warnings >= 5);
 
   const breakdown = report.answers_breakdown || {
     answered: 20,
@@ -223,8 +223,8 @@ const ExamResult = () => {
 
               <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-center">
                 <span className="text-[11px] text-slate-400 font-semibold block">AI Warnings</span>
-                <span className={`text-2xl font-extrabold mt-1 block ${report.total_warnings >= 3 ? 'text-rose-400' : 'text-amber-400'}`}>
-                  {report.total_warnings || 0} / 3
+                <span className={`text-2xl font-extrabold mt-1 block ${report.total_warnings >= 5 ? 'text-rose-400' : 'text-amber-400'}`}>
+                  {report.total_warnings || 0} / 5
                 </span>
               </div>
 

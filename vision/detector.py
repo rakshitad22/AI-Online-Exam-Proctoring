@@ -12,15 +12,16 @@ except ImportError:
     HAS_OPENCV = False
 
 try:
-    from vision.utils import base64_to_cv2, extract_keyframe_motion, resize_frame_for_inference, non_max_suppression
+    from vision.utils import base64_to_cv2, resize_frame_for_inference, non_max_suppression
 except ImportError:
-    from backend.vision.utils import base64_to_cv2, extract_keyframe_motion, resize_frame_for_inference, non_max_suppression
+    from backend.vision.utils import base64_to_cv2, resize_frame_for_inference, non_max_suppression
 
 logger = logging.getLogger("vision.detector")
 
 class AbnormalActivityDetector:
     """
     Real Computer Vision & AI Abnormal Activity Detector for Online Exam Proctoring.
+    Tracks Mobile Phones (External Devices), Multiple Persons, Head Movement, and Talking.
     """
 
     CLASS_NORMAL = "Normal exam behavior"
@@ -36,23 +37,17 @@ class AbnormalActivityDetector:
         self.smile_cascade = None
         
         self.head_pose_history = deque(maxlen=history_size)
-        self.mouth_motion_history = deque(maxlen=history_size)
         self.multi_person_history = deque(maxlen=history_size)
         self.phone_history = deque(maxlen=history_size)
         
         self.prev_frame_gray = None
-        
-        self.head_yaw_threshold = 0.22
-        self.head_pitch_threshold = 0.25
-        self.talking_mar_threshold = 0.35
-        self.consecutive_frames_required = 2
 
     def load_model(self):
         if self.is_loaded:
             return
 
         if not HAS_OPENCV or cv2 is None:
-            logger.info("OpenCV runtime not available; detector active in pure NumPy mode.")
+            logger.info("OpenCV runtime not available; detector active in fallback mode.")
             self.is_loaded = True
             return
 
@@ -79,6 +74,74 @@ class AbnormalActivityDetector:
             logger.warning(f"Notice initializing OpenCV cascades: {e}")
             self.is_loaded = True
 
+    def _detect_mobile_phone(self, img_bgr, gray) -> Tuple[bool, List[Dict[str, Any]]]:
+        """
+        OpenCV Contour & Aspect-Ratio detector for handheld mobile phones / rectangular devices.
+        Detects 4-corner polygons with phone aspect ratios (~1.3 - 2.8) and area between 1.2% and 35% of frame.
+        """
+        if not HAS_OPENCV or cv2 is None:
+            return False, []
+
+        h, w = img_bgr.shape[:2]
+        frame_area = h * w
+        phone_boxes = []
+
+        try:
+            blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+            edges = cv2.Canny(blurred, 40, 120)
+
+            # Dilate edges slightly to connect broken lines
+            kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+            dilated = cv2.dilate(edges, kernel, iterations=1)
+
+            contours, _ = cv2.findContours(dilated, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+            for cnt in contours:
+                area = cv2.contourArea(cnt)
+                if area < 0.012 * frame_area or area > 0.38 * frame_area:
+                    continue
+
+                peri = cv2.arcLength(cnt, True)
+                approx = cv2.approxPolyDP(cnt, 0.035 * peri, True)
+
+                rect = cv2.minAreaRect(cnt)
+                (cx, cy), (rw, rh), angle = rect
+
+                if rw == 0 or rh == 0:
+                    continue
+
+                aspect_ratio = max(rw, rh) / min(rw, rh)
+
+                # Mobile phone aspect ratio is typically between 1.3 and 2.8
+                if 1.28 <= aspect_ratio <= 2.85:
+                    rect_box = cv2.boxPoints(rect)
+                    rect_box = np.int32(rect_box)
+
+                    x1 = max(0, int(np.min(rect_box[:, 0])))
+                    y1 = max(0, int(np.min(rect_box[:, 1])))
+                    x2 = min(w, int(np.max(rect_box[:, 0])))
+                    y2 = min(h, int(np.max(rect_box[:, 1])))
+
+                    # Ensure box dimensions make sense
+                    if (x2 - x1) > 25 and (y2 - y1) > 25:
+                        phone_boxes.append({
+                            "x1": round(float(x1) / w, 3),
+                            "y1": round(float(y1) / h, 3),
+                            "x2": round(float(x2) / w, 3),
+                            "y2": round(float(y2) / h, 3),
+                            "label": "mobile phone",
+                            "confidence": 0.94
+                        })
+                        if len(phone_boxes) >= 2:
+                            break
+
+            if phone_boxes:
+                return True, phone_boxes
+        except Exception as e:
+            logger.warning(f"Phone contour detection notice: {e}")
+
+        return False, []
+
     def process_frame(self, frame_bytes: bytes) -> Dict[str, Any]:
         if not self.is_loaded:
             self.load_model()
@@ -96,25 +159,53 @@ class AbnormalActivityDetector:
             img_bgr = resize_frame_for_inference(img_bgr, target_width=640)
             h, w = img_bgr.shape[:2]
 
-            if HAS_OPENCV and cv2 is not None and self.face_cascade and not self.face_cascade.empty() and h >= 80 and w >= 80:
+            if HAS_OPENCV and cv2 is not None and h >= 80 and w >= 80:
                 gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
                 gray_eq = cv2.equalizeHist(gray)
 
-                raw_faces = self.face_cascade.detectMultiScale(
-                    gray_eq, scaleFactor=1.1, minNeighbors=5, minSize=(80, 80)
-                )
+                # 1. Check for Mobile Phone / External Device
+                phone_detected, phone_boxes = self._detect_mobile_phone(img_bgr, gray)
+                if phone_detected:
+                    return {
+                        "is_suspicious": True,
+                        "detected_class": self.CLASS_EXTERNAL_DEVICE,
+                        "severity": "HIGH",
+                        "confidence": 0.94,
+                        "bounding_boxes": phone_boxes,
+                        "warning_triggered": True,
+                        "warning_message": "CRITICAL: Mobile phone / external device detected in camera frame!",
+                        "details": {"device": "mobile_phone"}
+                    }
 
-                boxes = []
+                # 2. Check for Face Detections (Multiple Persons & Head Pose)
+                raw_faces = []
+                if self.face_cascade and not self.face_cascade.empty():
+                    raw_faces = self.face_cascade.detectMultiScale(
+                        gray_eq, scaleFactor=1.1, minNeighbors=4, minSize=(70, 70)
+                    )
+
+                profile_faces = []
+                if self.profile_face_cascade and not self.profile_face_cascade.empty():
+                    profile_faces = self.profile_face_cascade.detectMultiScale(
+                        gray_eq, scaleFactor=1.1, minNeighbors=4, minSize=(70, 70)
+                    )
+
+                all_face_boxes = []
                 if len(raw_faces) > 0:
                     for (fx, fy, fw, fh) in raw_faces:
-                        boxes.append([fx, fy, fx + fw, fy + fh])
-                    boxes = np.array(boxes)
-                    nms_boxes = non_max_suppression(boxes, overlap_thresh=0.4)
+                        all_face_boxes.append([fx, fy, fx + fw, fy + fh])
+                if len(profile_faces) > 0:
+                    for (fx, fy, fw, fh) in profile_faces:
+                        all_face_boxes.append([fx, fy, fx + fw, fy + fh])
+
+                if all_face_boxes:
+                    all_face_boxes = np.array(all_face_boxes)
+                    nms_boxes = non_max_suppression(all_face_boxes, overlap_thresh=0.4)
                 else:
                     nms_boxes = np.array([])
 
-                bounding_boxes = []
                 person_count = len(nms_boxes)
+                bounding_boxes = []
                 for box in nms_boxes:
                     x1, y1, x2, y2 = box
                     bounding_boxes.append({
@@ -126,18 +217,30 @@ class AbnormalActivityDetector:
                         "confidence": 0.95
                     })
 
-                is_multi_person = person_count > 1
-                self.multi_person_history.append(is_multi_person)
-                if sum(self.multi_person_history) >= self.consecutive_frames_required:
+                # Check Multiple Persons
+                if person_count > 1:
                     return {
                         "is_suspicious": True,
                         "detected_class": self.CLASS_MULTIPLE_PERSONS,
                         "severity": "HIGH",
-                        "confidence": 0.92,
+                        "confidence": 0.93,
                         "bounding_boxes": bounding_boxes,
                         "warning_triggered": True,
                         "warning_message": f"CRITICAL: Multiple persons ({person_count}) detected in camera frame!",
                         "details": {"person_count": person_count}
+                    }
+
+                # Check Head Movement (Profile face or side offset)
+                if len(profile_faces) > 0 and person_count == 1:
+                    return {
+                        "is_suspicious": True,
+                        "detected_class": self.CLASS_HEAD_MOVEMENT,
+                        "severity": "LOW",
+                        "confidence": 0.85,
+                        "bounding_boxes": bounding_boxes,
+                        "warning_triggered": True,
+                        "warning_message": "WARNING: Unusual head orientation / turned away from exam screen",
+                        "details": {"pose": "head_turned"}
                     }
 
             return {
